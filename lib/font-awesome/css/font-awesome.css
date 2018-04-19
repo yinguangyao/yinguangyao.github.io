@@ -1300,6 +1300,12 @@
 .fa-weibo:before {
   content: "\f18a";
 }
+.fa-zhihu:before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: url('../../images/zhihu.svg')
+}
 .fa-renren:before {
   content: "\f18b";
 }

@@ -160,7 +160,7 @@
       </a>
     </div>
       
-        <p class="site-subtitle"></p>
+        <h1 class="site-subtitle" itemprop="description"></h1>
       
   </div>
 
@@ -262,6 +262,687 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/underscore查找索引函数分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/25/underscore查找索引函数分析/" itemprop="url">underscore查找索引函数分析</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T22:16:51+08:00">
+                2018-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这是underscore源码剖析系列第七篇文章，这篇文章主要介绍underscore中查找数组中某一项索引或者对象中某个key的函数。</p>
+<h2 id="find"><a href="#find" class="headerlink" title="find"></a>find</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// find函数接受三个参数，分别是集合obj、检测函数predicate和上下文context</span><br><span class="line">_.find = _.detect = function (obj, predicate, context) &#123;</span><br><span class="line">    var key;</span><br><span class="line">    // 判断是否是类数组，如果是类数组就查找索引，是对象就查找key</span><br><span class="line">    if (isArrayLike(obj)) &#123;</span><br><span class="line">    	key = _.findIndex(obj, predicate, context);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">    	key = _.findKey(obj, predicate, context);</span><br><span class="line">    &#125;</span><br><span class="line">    // 如果查不到，findIndex会返回-1，而findKey会什么都不返回（默认undefined）</span><br><span class="line">    // 所以这里对没有查找到的情况做了判断</span><br><span class="line">    if (key !== void 0 &amp;&amp; key !== -1) return obj[key];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>findKey和findIndex方法的实现也都比较简单。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">_.findKey = function (obj, predicate, context) &#123;</span><br><span class="line">	predicate = cb(predicate, context);</span><br><span class="line">	var keys = _.keys(obj), key;</span><br><span class="line">	for (var i = 0, length = keys.length; i &lt; length; i++) &#123;</span><br><span class="line">		key = keys[i];</span><br><span class="line">		// 直接return出key意味着只返回第一个通过predicate检测的值</span><br><span class="line">		if (predicate(obj[key], key, obj)) return key;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">// 根据传入dir的正负来判断是findIndex还是findLastIndex</span><br><span class="line">function createPredicateIndexFinder(dir) &#123;</span><br><span class="line">	return function (array, predicate, context) &#123;</span><br><span class="line">	    // cb中对predicate绑定作用域</span><br><span class="line">		predicate = cb(predicate, context);</span><br><span class="line">		var length = getLength(array);</span><br><span class="line">        // 根据dir判断是从头遍历还是从尾遍历</span><br><span class="line">		var index = dir &gt; 0 ? 0 : length - 1;</span><br><span class="line">		// 这里需要判断两个临界条件</span><br><span class="line">		for (; index &gt;= 0 &amp;&amp; index &lt; length; index += dir) &#123;</span><br><span class="line">			// 遍历数组，并将每一项和key都传到函数中进行运算，返回结果为true的index值</span><br><span class="line">			if (predicate(array[index], index, array)) return index;</span><br><span class="line">		&#125;</span><br><span class="line">		// 查找不到就返回-1</span><br><span class="line">		return -1;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Returns the first index on an array-like that passes a predicate test</span><br><span class="line">_.findIndex = createPredicateIndexFinder(1);</span><br><span class="line">_.findLastIndex = createPredicateIndexFinder(-1);</span><br></pre></td></tr></table></figure></p>
+<h2 id="sortedIndex二分查找"><a href="#sortedIndex二分查找" class="headerlink" title="sortedIndex二分查找"></a>sortedIndex二分查找</h2><p>sortedIndex函数是返回一个值在数组中的位置（注意：这个值不一定在数组中）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var arr = [10, 20, 30, 40]</span><br><span class="line">_.sortedIndex(arr, 25) // 返回2</span><br></pre></td></tr></table></figure></p>
+<p>由于sortedIndex是二分查找的实现，所以必须保证传入的数组是升序的（或者数组对象中按某属性升序排列）。<br>这里是维基百科对二分查找的定义：</p>
+<blockquote>
+<p>在计算机科学中，二分搜索（英语：binary search），也称折半搜索（英语：half-interval<br>search）、对数搜索（英语：logarithmicsearch），是一种在有序数组中查找某一特定元素的搜索算法。搜索过程从数组的中间元素开始，如果中间元素正好是要查找的元素，则搜索过程结束；如果某一特定元素大于或者小于中间元素，则在数组大于或小于中间元素的那一半中查找，而且跟开始一样从中间元素开始比较。如果在某一步骤数组为空，则代表找不到。这种搜索算法每一次比较都使搜索范围缩小一半。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 二分法，可以理解为以中间元素为基准，将数组分成两个</span><br><span class="line">// 首先获取到数组中间的元素，比较传入的obj和中间元素的大小</span><br><span class="line">// 如果obj大于这个元素，那么就说明这个obj应该是在数组右半段</span><br><span class="line">// 反过来，就是在数组左半段</span><br><span class="line">_.sortedIndex = function (array, obj, iteratee, context) &#123;</span><br><span class="line">    // 不理解cb函数的建议去看我之前的文章</span><br><span class="line">	iteratee = cb(iteratee, context, 1);</span><br><span class="line">	// obj有可能是一个对象，iteratee(obj)会返回当前obj中的某个值</span><br><span class="line">	// 如果obj是&#123;age: 20, name: &quot;ygy&quot;&#125;，iteratee是age，那么这个就是根据age来获取到index的</span><br><span class="line">	var value = iteratee(obj);</span><br><span class="line">	var low = 0, high = getLength(array);</span><br><span class="line">	// 通过while循环来不断重复上述过程，直到找到obj的位置</span><br><span class="line">	while (low &lt; high) &#123;</span><br><span class="line">		var mid = Math.floor((low + high) / 2);</span><br><span class="line">		if (iteratee(array[mid]) &lt; value) low = mid + 1; else high = mid;</span><br><span class="line">	&#125;</span><br><span class="line">	return low;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="indexOf"><a href="#indexOf" class="headerlink" title="indexOf"></a>indexOf</h2><p>indexOf函数接收array、value和isSorted三个参数。<br>indexOf返回value在该 array 中的索引值，如果value不存在 array中就返回-1。<br>使用原生的indexOf 函数，除非它失效。如果您正在使用一个大数组，你知道数组已经排序，传递true给isSorted将更快的用sortedIndex二分查找..,或者，传递一个数字作为第三个参数，为了在给定的索引的数组中寻找第一个匹配值。<br>lastIndexOf接收array、value和fromIndex三个参数。<br>lastIndexOf返回value在该 array 中的从最后开始的索引值，如果value不存在 array中就返回-1。如果支持原生的lastIndexOf，将使用原生的lastIndexOf函数。 传递fromIndex将从你给定的索性值开始搜索。<br>给下面返回值编上号，以便后面可以直接拿来讲。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3, 2, 4, 5]</span><br><span class="line">var index1 = _.indexOf(arr, 2) // 1</span><br><span class="line">// 如果传了索引值为2，那就是从索引为2的地方开始搜索</span><br><span class="line">// 如果不传第三个参数，可以理解为默认是从0开始搜索</span><br><span class="line">var index2 = _.indexOf(arr, 2, 2) // 3</span><br><span class="line">// 从索引为-1的地方查找意思就是从length-2的索引开始查找</span><br><span class="line">var index3 = _.indexOf(arr, 2, -1)</span><br><span class="line"></span><br><span class="line">// lastIndexOf是从数组末尾反向查询，返回第一个查询到的索引值</span><br><span class="line">var index4 = _.lastIndexOf(arr, 2) // 3</span><br><span class="line"></span><br><span class="line">// 如果传了索引值（比如下面的4），意味着将截取数组里面0-4的部分</span><br><span class="line">// 将这部分当作新数组，从数组末尾反向查询，返回第一个查询到的索引值</span><br><span class="line">// 当然这个查询到的索引值还是按照原来数组来看的，以下面这个为例，传入了4</span><br><span class="line">// 意味着从1,2,3,2,4中反向查询2，查询到的第一个2在原arr数组中索引为3</span><br><span class="line">//其实个人理解类似于如果我不传第三个参数，那就默认的是6（arr的长度）</span><br><span class="line">var index5 = _.lastIndexOf(arr, 2, 4) // 3</span><br><span class="line"></span><br><span class="line">// 这种情况下传入-1类似于传入5，因为如果不传第三个参数，其实类似于从index为6开始反向查的，传入负值就是从fromIndex+arr.length开始搜索</span><br><span class="line">var index6 = _.lastIndexOf(arr, 2, -1)</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://pic1.zhimg.com/80/v2-49801dd40b6c27e54726fc7f0aed23d6_hd.jpg" alt="图示"><br>可能上面有点绕，这里我们再看一下源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">_.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);</span><br><span class="line">_.lastIndexOf = createIndexFinder(-1, _.findLastIndex);</span><br><span class="line">function createIndexFinder(dir, predicateFind, sortedIndex) &#123;</span><br><span class="line">    // idx有可能是布尔类型（isSorted）和数字类型</span><br><span class="line">	return function (array, item, idx) &#123;</span><br><span class="line">		var i = 0, length = getLength(array);</span><br><span class="line">		// 如果idx是数字类型，那就是从某个索引开始搜索</span><br><span class="line">		if (typeof idx == &apos;number&apos;) &#123;</span><br><span class="line">		    // dir大于0的时候是从左到右查询（indexOf）</span><br><span class="line">			if (dir &gt; 0) &#123;</span><br><span class="line">				// 这里对idx进行了处理，如果idx为负数，那就从加上length的索引开始算</span><br><span class="line">				// idx为负数对应上面的index3的情况</span><br><span class="line">				i = idx &gt;= 0 ? idx : Math.max(idx + length, i);</span><br><span class="line">			// dir小于0的时候是从右到左查询（lastIndexOf）</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				// 从index开始反向查找，如果idx为正，那么不能超过数组长度</span><br><span class="line">				// 如果idx为负，那就取idx+length+1（这里之所以+1是为了兼容后面for循环里面的-1，因为如果什么都不传的情况下，循环肯定是从0到length-1）</span><br><span class="line">				length = idx &gt;= 0 ? Math.min(idx + 1, length) : Math.max(idx, idx + length + 1);</span><br><span class="line">			&#125;</span><br><span class="line">		// 如果idx为布尔类型，那么就使用sortedIndex二分查找</span><br><span class="line">		&#125; else if (sortedIndex &amp;&amp; idx &amp;&amp; length) &#123;</span><br><span class="line">			// 使用二分法来查找</span><br><span class="line">			idx = sortedIndex(array, item);</span><br><span class="line">			return array[idx] === item ? idx : -1;</span><br><span class="line">		&#125;</span><br><span class="line">		// 如果item是NaN</span><br><span class="line">		if (item !== item) &#123;</span><br><span class="line">		    // 数组里面有可能有NaN，因为NaN不和自身相等，所以这里传入了isNaN的方法来检测</span><br><span class="line">		    // 其实这里面对array.slice(i, length)的每一项都用isNaN来检测了</span><br><span class="line">			idx = predicateFind(slice.call(array, i, length), _.isNaN);</span><br><span class="line">			// 这里之所以加上i，是因为predicateFind函数里面是根据array.slice(i, length)的长度来循环最终获取到index值，</span><br><span class="line">			// 这样其实少算了一段长度为i的数组，这个可以去看createPredicateIndexFinder函数</span><br><span class="line">			return idx &gt;= 0 ? idx + i : -1;</span><br><span class="line">		&#125;</span><br><span class="line">		// 根据上面计算出来的i和length来进行循环</span><br><span class="line">		// 这里不用加上i是因为一开始就是从i或者length-1开始遍历的</span><br><span class="line">		for (idx = dir &gt; 0 ? i : length - 1; idx &gt;= 0 &amp;&amp; idx &lt; length; idx += dir) &#123;</span><br><span class="line">			if (array[idx] === item) return idx;</span><br><span class="line">		&#125;</span><br><span class="line">		return -1;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>原本indexOf只是个简单的方法，只不过这里面考虑到lastIndexOf可以传入负值以及indexOf使用二分查找优化才让人那么难懂。<br>这篇文章如果有什么错误和不足之处，希望大家可以指出，有疑惑也可以直接在评论区提出来。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/23/underscore debuounce防抖动函数分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/23/underscore debuounce防抖动函数分析/" itemprop="url">underscore debuounce防抖动函数分析</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T22:15:06+08:00">
+                2018-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本文是underscore源码剖析系列第六篇文章，上节我们介绍了throttle节流函数的实现，这节将会介绍一下节流函数的兄弟 —— debounce防抖动函数。<br>throttle函数是在高频率触发的情况下，为了防止函数的频繁调用，将其限制在一段时间内只会调用一次。而debounce函数则是在频繁触发的情况下，只在触发的最后一次调用一次，想像一下如果我们用手按住一个弹簧，那么只有等到我们把手松开，弹簧才会弹起来，下面我用一个电梯的例子来介绍debounce函数。</p>
+<h2 id="电梯"><a href="#电梯" class="headerlink" title="电梯"></a>电梯</h2><p>假如我下班的时候去坐电梯，等了一段时间后，电梯正准备关上门下降，这个时候一个同事走了过来，电梯门被打开，这样电梯就会继续等一段时间，如果中间一直有人进来，那么电梯就一直不会下降，直到最后一个人进来后过了一定时间后还没有下一个人进来，这时电梯才会下降。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>除了电梯，事实上我们还有很多应用场景，比如我用键盘不断输入文字，我希望等最后一次输入结束后才会调用接口来请求展示联想词，如果每次输入一个字的时候就会调用接口，这样调用未免太过于频繁了。<br>未使用debounce的输入：<br><img src="https://pic1.zhimg.com/v2-b702de1108e20324c9fa8c492825a14a_b.gif" alt="未使用debounce"><br>使用debounce的输入：<br><img src="https://pic3.zhimg.com/v2-86ef7d20bd65b88884538ade33dfc3c8_b.gif" alt="使用debounce"></p>
+<h2 id="简单的debounce"><a href="#简单的debounce" class="headerlink" title="简单的debounce"></a>简单的debounce</h2><p>知道debounce的工作原理了，我们可以先自己实现一个比较简单的debounce函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">function debounce(func, wait) &#123;</span><br><span class="line">	var timeout,</span><br><span class="line">		args, </span><br><span class="line">		context</span><br><span class="line">	var later = function() &#123;</span><br><span class="line">		func.apply(context, args)</span><br><span class="line">		timeout = context = args = null</span><br><span class="line">	&#125;</span><br><span class="line">	return function() &#123;</span><br><span class="line">		context = this</span><br><span class="line">		args = arguments</span><br><span class="line">		// 每次触发都清理掉前一次的定时器</span><br><span class="line">		clearTimeout(timeout)</span><br><span class="line">		// 只有最后一次触发后才会调用later</span><br><span class="line">		timeout = setTimeout(later, wait)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>麻雀虽小，五脏俱全。<br>不过这个函数还是有很多问题，比如每次触发都要反复的清除和设置定时器，我们来看一下underscore的实现。</p>
+<h2 id="underscore-debounce"><a href="#underscore-debounce" class="headerlink" title="underscore debounce"></a>underscore debounce</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">// debounce函数传入三个参数，分别是要执行的函数func，延迟时间wait，是否立即执行immediate</span><br><span class="line">// 如果immediate为true，那么就会在wait时间段一开始就执行一次func，之后不管触发多少次都不会再执行func</span><br><span class="line">// 在类似不小心点了提交按钮两下而提交了两次的情况下很有用</span><br><span class="line">_.debounce = function (func, wait, immediate) &#123;</span><br><span class="line">		var timeout, args, context, timestamp, result;</span><br><span class="line"></span><br><span class="line">		var later = function () &#123;</span><br><span class="line">		    // 这个是最关键的一步，因为每次触发的时候都要记录当前timestamp</span><br><span class="line">		    // 但是later是第一次触发后wait时间后执行的，_now()减去第一次触发时的时间当然是等于wait的</span><br><span class="line">		    // 但是如果后续继续触发，那么_.now() - timestamp肯定会小于wait</span><br><span class="line">		    // last是执行later的时间和上一次触发的时间差</span><br><span class="line">			var last = _.now() - timestamp;</span><br><span class="line">            // 如果在later执行前还有其他触发，那么就会重新设置定时器</span><br><span class="line">            // last &gt;= 0应该是防止客户端系统时间被调整</span><br><span class="line">			if (last &lt; wait &amp;&amp; last &gt;= 0) &#123;</span><br><span class="line">				timeout = setTimeout(later, wait - last);</span><br><span class="line">			// 如果last大于等于wait，也就是说设置timeout定时器后没有再触发过</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				timeout = null;</span><br><span class="line">				// 这个时候如果immediate不为true，就会立即执行func函数，这也是为什么immediate为true的时候只会执行第一次触发</span><br><span class="line">				if (!immediate) &#123;</span><br><span class="line">					result = func.apply(context, args);</span><br><span class="line">					// 解除引用</span><br><span class="line">					if (!timeout) context = args = null;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		return function () &#123;</span><br><span class="line">			context = this;</span><br><span class="line">			args = arguments;</span><br><span class="line">			// 每次触发都用timestamp记录时间戳</span><br><span class="line">			timestamp = _.now();</span><br><span class="line">			// 第一次进来的时候，如果immediate为true，那么会立即执行func</span><br><span class="line">			var callNow = immediate &amp;&amp; !timeout;</span><br><span class="line">			// 第一次进来的时候会设置一个定时器</span><br><span class="line">			if (!timeout) timeout = setTimeout(later, wait);</span><br><span class="line">			if (callNow) &#123;</span><br><span class="line">				result = func.apply(context, args);</span><br><span class="line">				context = args = null;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			return result;</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+<p>underscore的实现比较巧妙，为了防止出现我们上面那种不停地清除、设置定时器的情况，underscore则会在每次触发时都记录时间戳，在wait时间后定时器触发执行later函数时计算当前时间和时间戳之差，如果小于wait时间，那么在之后肯定还有其他触发，这时再重新设置定时器，这样不仅解决了上面的问题，也保证了最后一次触发后wait时间才会执行func。</p>
+<p>同时，在我们的基础之上，underscore加入了immediate参数。如果传入的immediate为true，那么只会在第一次进来的时候立即执行。很明显在上面代码中func执行只有两处，一个是callNow判断里面，一个是!immediate判断里面，所以这样保证了后续触发不会再执行func。</p>
+<p><strong>参考链接：</strong><br>1、<a href="https://segmentfault.com/a/1190000010983733" target="_blank" rel="noopener">浅谈throttle以及debounce的原理和实现
+</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/underscore throttle节流函数分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/22/underscore throttle节流函数分析/" itemprop="url">throttle节流函数分析</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-22T22:14:47+08:00">
+                2018-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这是underscore源码剖析系列第五篇，今天来聊一下throttle和debounce两个函数。</p>
+<h2 id="throttle节流函数"><a href="#throttle节流函数" class="headerlink" title="throttle节流函数"></a>throttle节流函数</h2><p>Javascript中的函数大多数情况下都是用户调用执行的，但是在某些场景下不是用户直接控制的，在这些场景下，函数会被频繁调用，容易造成性能问题。<br>比如在window.onresize事件和window.onScroll事件中，由于用户可以不断地触发，这会导致函数短时间内频繁调用，如果函数中有复杂的计算，很容易就造成性能的问题。<br>这些场景下最主要的问题是触发频率太高，1s内可以触发数次，但是大多数情况下我们并不需要那么高的触发频率，可能只要在500ms内触发一次，这样其实我们可以用setTimeout来解决，在这期间的触发都忽略掉。<br>我们可以先尝试着自己实现一个节流函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  // 自己实现的简单节流函数</span><br><span class="line">function throttle (func, time) &#123;</span><br><span class="line">	var timeout = null,</span><br><span class="line">		context = null,</span><br><span class="line">		args = null</span><br><span class="line">	return function() &#123;</span><br><span class="line">	    context = this</span><br><span class="line">		args = arguments</span><br><span class="line">		// 只要timeout函数存在，所有调用都无视</span><br><span class="line">		if(timeout) return;</span><br><span class="line">		timeout = setTimeout(function() &#123;</span><br><span class="line">			func.apply(context, args)</span><br><span class="line">			clearTimeout(timeout)</span><br><span class="line">			timeout = null</span><br><span class="line">		&#125;, time||500)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们实现了一个简单的节流函数，但是还不够完整，如果我想在第一次触发的时候立即执行怎么办？如果我想禁用掉最后一次执行怎么办？underscore中实现了一个比较完整的节流函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">// options是一个对象，如果options.leading为false，就是禁用第一次触发立即调用</span><br><span class="line">// 如果options.trailing为false，则是禁用第一次执行</span><br><span class="line">_.throttle = function (func, wait, options) &#123;</span><br><span class="line">		// 一些初始化操作</span><br><span class="line">		var context, args, result;</span><br><span class="line">		var timeout = null;</span><br><span class="line">		var previous = 0;</span><br><span class="line">		if (!options) options = &#123;&#125;;</span><br><span class="line">		var later = function () &#123;</span><br><span class="line">			// 如果禁用第一次首先执行，返回0否则就用previous保存当前时间戳</span><br><span class="line">			previous = options.leading === false ? 0 : _.now();</span><br><span class="line">			// 解除引用</span><br><span class="line">			timeout = null;</span><br><span class="line">			result = func.apply(context, args);</span><br><span class="line">			// 看到一种说法是在func函数里面重新给timeout赋值，会导致timeout依然存在，所以这里会判断!timeout</span><br><span class="line">			if (!timeout) context = args = null;</span><br><span class="line">		&#125;;</span><br><span class="line">		return function () &#123;</span><br><span class="line">		    // 获取当前调用时的时间（ms）</span><br><span class="line">			var now = _.now();</span><br><span class="line">			// 如果previous为0并且禁用了第一次执行，那么将previous设置为当前时间</span><br><span class="line">			// 这里用全等来避免undefined的情况</span><br><span class="line">			if (!previous &amp;&amp; options.leading === false) previous = now;</span><br><span class="line">			// 还要wait时间才会触发下一次func</span><br><span class="line">			var remaining = wait - (now - previous);</span><br><span class="line">			context = this;</span><br><span class="line">			args = arguments;</span><br><span class="line">			// remaining小于0有两种情况，一种是上次调用后到现在已经到了wait时间</span><br><span class="line">			// 一种情况是第一次触发的时候并且options.leading不为false，previous为0，因为now记录的是unix时间戳，所以会远远大于wait</span><br><span class="line">			// remaining大于wait的情况我自己不清楚，但看到一种说法是客户端系统时间被调整过，可能会出现now小于previous的情况</span><br><span class="line">			// 这两种情形下会立即执行func函数，并把previous设置为now</span><br><span class="line">			if (remaining &lt;= 0 || remaining &gt; wait) &#123;</span><br><span class="line">				if (timeout) &#123;</span><br><span class="line">				    // 清除定时器</span><br><span class="line">					clearTimeout(timeout);</span><br><span class="line">					timeout = null;</span><br><span class="line">				&#125;</span><br><span class="line">				// previous保存当前触发的时间戳</span><br><span class="line">				previous = now;</span><br><span class="line">				result = func.apply(context, args);</span><br><span class="line">				if (!timeout) context = args = null;</span><br><span class="line">			// 如果timeout不存在（当前定时器还存在）</span><br><span class="line">			// 并且options.trailing不为false，这个时候会重新设置定时器，remaining时间后执行later函数</span><br><span class="line">			&#125; else if (!timeout &amp;&amp; options.trailing !== false) &#123;</span><br><span class="line">				timeout = setTimeout(later, remaining);</span><br><span class="line">			&#125;</span><br><span class="line">			return result;</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码看着不多，但是让我纠结了很久，运行的时候主要会有以下几种情况。</p>
+<h3 id="没有传leading和trailing"><a href="#没有传leading和trailing" class="headerlink" title="没有传leading和trailing"></a>没有传leading和trailing</h3><ol>
+<li>第一次触发函数的时候，由于previous为0，而now又非常大，所以会导致remaining为负值，满足下面第一个if判断，所以会立即执行func函数（第一次触发时立即调用）并且用previous记录当前时间戳</li>
+<li>第二次触发的时候由于previous记录了前一次的时间戳，所以now - previous几乎为0，这个时候满足else if里面的判断，会设置一个定时器，这个定时器在remaining时间后执行，所以只要在remaining时间内不管我们再怎么频繁触发，由于不会满足两个if里面的条件，所以都不会执行func，一直到remaining后才会执行func</li>
+<li>之后每次触发都会重复走2的流程</li>
+</ol>
+<h3 id="options-leading-false"><a href="#options-leading-false" class="headerlink" title="options.leading: false"></a>options.leading: false</h3><p>这种情况和上面情况类似，不过区别在于第一次触发的时候。<br>由于满足!previous &amp;&amp; options.leading === false这个条件，所以previous会被设置为now，这个时候remaining等于wait，所以会走else if的分支，这样就会重复前一种情况下步骤2的流程</p>
+<h3 id="options-trailing-false"><a href="#options-trailing-false" class="headerlink" title="options.trailing: false"></a>options.trailing: false</h3><ol>
+<li>由于没有设置leading为false，所以第一次触发就会立即执行一次func</li>
+<li>第二次触发的时候，由于previous保存了上次时间戳，所以remaining &lt;= wait，但是又因为options.trailing为false，这样就不会走if的任何一个分支，一直到now-previous大于wait的时候（也就是过了wait时间后），这样会满足if第一个分支的条件，func会立即被执行一次</li>
+<li>之后重复步骤2</li>
+</ol>
+<h3 id="trailing和leading都为false"><a href="#trailing和leading都为false" class="headerlink" title="trailing和leading都为false"></a>trailing和leading都为false</h3><p>最好不要这么写，因为会导致一个bug的出现，如果我们在一段时间内频繁触发，这个是没什么问题，但如果我们最后一次触发后停止等待ait时间后再重新开始触发，这时候的第一次触发就会立即执行func，leading为false并没有生效。</p>
+<p>不知道有没有人和我一样有这两个疑问，leading为false的时候，真的只是在第一次调用的时候有区别吗？trailing是怎么做到禁用最后一次执行的？<br>这两个问题让我昨晚睡觉前都还在纠结，还好今天在segmentfault上面有热心的用户帮我解答了。<br>请直接看第一个回答以及下面的评论区：<a href="https://segmentfault.com/q/1010000013899949" target="_blank" rel="noopener">关于underscore源码中throttle函数的疑惑？</a></p>
+<h2 id="leading带来的不同表现"><a href="#leading带来的不同表现" class="headerlink" title="leading带来的不同表现"></a>leading带来的不同表现</h2><p>GDUTxxZ大神给了一段代码，执行后不同的表现让我印象深刻。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">var _now = new Date().getTime()</span><br><span class="line">var throttle = function(func, wait, options) &#123;</span><br><span class="line">  var context, args, result;</span><br><span class="line">  var timeout = null;</span><br><span class="line">  var previous = 0;</span><br><span class="line">  if (!options) options = &#123;&#125;;</span><br><span class="line">  var later = function() &#123;</span><br><span class="line">    previous = options.leading === false ? 0 : new Date().getTime();</span><br><span class="line">    timeout = null;</span><br><span class="line">    result = func.apply(context, args);</span><br><span class="line">    if (!timeout) context = args = null;</span><br><span class="line">  &#125;;</span><br><span class="line">  return function() &#123;</span><br><span class="line">    console.log(`函数$&#123;++i&#125;在$&#123;new Date().getTime() - _now&#125;调用`)</span><br><span class="line">    var now = new Date().getTime();</span><br><span class="line">    if (!previous &amp;&amp; options.leading === false) previous = now;</span><br><span class="line">    var remaining = wait - (now - previous);</span><br><span class="line">    context = this;</span><br><span class="line">    args = arguments;</span><br><span class="line">    // 如果超过了wait时间，那么就立即执行</span><br><span class="line">    if (remaining &lt;= 0 || remaining &gt; wait) &#123;</span><br><span class="line">      if (timeout) &#123;</span><br><span class="line">        clearTimeout(timeout);</span><br><span class="line">        timeout = null;</span><br><span class="line">      &#125;</span><br><span class="line">      previous = now;</span><br><span class="line">      result = func.apply(context, args);</span><br><span class="line">      if (!timeout) context = args = null;</span><br><span class="line">    &#125; else if (!timeout &amp;&amp; options.trailing !== false) &#123;</span><br><span class="line">      timeout = setTimeout(later, remaining);</span><br><span class="line">    &#125;</span><br><span class="line">    return result;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br><span class="line">var i = 0</span><br><span class="line">var test = throttle(() =&gt; &#123;</span><br><span class="line">  console.log(`函数$&#123;i&#125;在$&#123;new Date().getTime() - _now&#125;执行`)</span><br><span class="line">&#125;, 1000, &#123;leading: false&#125;)</span><br><span class="line"></span><br><span class="line">setInterval(test, 3000)</span><br></pre></td></tr></table></figure></p>
+<p>我将传入leading和没传入leading的情况作了以下比较。<br>leading为false时：<br><img src="https://pic1.zhimg.com/80/v2-7f14598aced570beef335ef7485c56f0_hd.jpg" alt="leading为false"><br>没有传入leading时：<br><img src="https://pic2.zhimg.com/80/v2-1bedfe844882f6c1967b4ec9d5029f3f_hd.jpg" alt="leading为true"><br>当两次触发间隔时间大于wait时间的时候，很明显leading为false的时候总会在调用后延迟wait后执行func，而不传leading的时候两者是同时的，调用test的时候就直接运行了func。原本应该是callback =&gt; wait =&gt; callback</p>
+<p>一般情况下当然不会有这种极端情况存在，但是可能出现这种情况。如果在scroll事件中，我们滚动一段距离后停止了，等wait ms后再开始滚动，这个时候如果leading为false，依然会延迟wait时间后执行，而不是立即执行，这也是为什么同时设置leading和trailing为false的时候会出现问题。</p>
+<h2 id="为什么是禁用最后一次调用"><a href="#为什么是禁用最后一次调用" class="headerlink" title="为什么是禁用最后一次调用"></a>为什么是禁用最后一次调用</h2><p>trailing为false时到底是怎么禁用了最后一次调用？这个也一直让我很纠结。同样的，我也写了一段代码，比较了一下两次运行后的不同结果。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">var _now = new Date().getTime()</span><br><span class="line">var throttle = function(func, wait, options) &#123;</span><br><span class="line">var context, args, result;</span><br><span class="line">var timeout = null;</span><br><span class="line">var previous = 0;</span><br><span class="line">if (!options) options = &#123;&#125;;</span><br><span class="line">var later = function() &#123;</span><br><span class="line">previous = options.leading === false ? 0 : new Date().getTime();</span><br><span class="line">timeout = null;</span><br><span class="line">result = func.apply(context, args);</span><br><span class="line">if (!timeout) context = args = null;</span><br><span class="line">&#125;;</span><br><span class="line">return function() &#123;</span><br><span class="line">console.log(`函数$&#123;++i&#125;在$&#123;new Date().getTime() - _now&#125;调用`)</span><br><span class="line">var now = new Date().getTime();</span><br><span class="line">if (!previous &amp;&amp; options.leading === false) previous = now;</span><br><span class="line">var remaining = wait - (now - previous);</span><br><span class="line">context = this;</span><br><span class="line">args = arguments;</span><br><span class="line">// 如果超过了wait时间，那么就立即执行</span><br><span class="line">if (remaining &lt;= 0 || remaining &gt; wait) &#123;</span><br><span class="line">  if (timeout) &#123;</span><br><span class="line">    clearTimeout(timeout);</span><br><span class="line">    timeout = null;</span><br><span class="line">  &#125;</span><br><span class="line">  previous = now;</span><br><span class="line">  result = func.apply(context, args);</span><br><span class="line">  if (!timeout) context = args = null;</span><br><span class="line">&#125; else if (!timeout &amp;&amp; options.trailing !== false) &#123;</span><br><span class="line">  timeout = setTimeout(later, remaining);</span><br><span class="line">&#125;</span><br><span class="line">return result;</span><br><span class="line">&#125;;</span><br><span class="line">&#125;;</span><br><span class="line">var i = 0</span><br><span class="line">var test = throttle(() =&gt; &#123;</span><br><span class="line">console.log(函数$&#123;i&#125;在$&#123;new Date().getTime() - _now&#125;执行)</span><br><span class="line">&#125;, 1000, &#123;trailing: false&#125;)</span><br><span class="line">window.addEventListener(&quot;scroll&quot;, test)</span><br></pre></td></tr></table></figure></p>
+<p>trailing为false时：<br><img src="https://pic1.zhimg.com/80/v2-e901c58912a573086e6db8bd36b0c2cf_hd.jpg" alt="trailing为false"></p>
+<p>没有设置trailing时：<br><img src="https://pic4.zhimg.com/80/v2-25ae6fdaa9472253d9b1fbd383edd54a_hd.jpg" alt="没有设置trailing"></p>
+<p>这两张图很明显的不同就是设置了trailing的时候，最后一次总是”执行”，而未设置trailing最后一次总是”调用”，少了一次执行。</p>
+<p>我们可以假设在一种临界的场景下，比如在倒数第二次执行func后的 (wait-1) 的时间内。<br>如果设置了trailing，因为无法走setTimeout，所以只能等待wait时间后才能立即调用func，所以在（wait-1）的时间内无论我们触发了多少次都不会执行func函数。<br>如果没有设置trailing，那么肯定会走setTimeout，在这个期间触发的第一次就会设置一个定时器，等到wait时间后自动执行func函数，到（wait-1）的这段时间内不管我们触发了多少次，反正第一次触发的时候就已经设置了定时器，所以到最后一定会执行一次func函数。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>很久以前就使用过throttle函数，自己也实现过简单的，但是看到underscore源码后才发现原来还会有这么多令人充满想象的场景，自己所学的这点知识真的是皮毛。<br>我知道自己平时叙述比较罗嗦，语言又比较无聊，希望大家可以理解，如果看完还不懂，建议结合下面的参考链接。<br>本文有错误和不足之处，也希望大家能够指出。</p>
+<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><ol>
+<li><a href="https://segmentfault.com/q/1010000013899949?_ea=3493310" target="_blank" rel="noopener">关于underscore源码中throttle函数的疑惑？</a></li>
+<li><a href="https://github.com/hanzichi/underscore-analysis/issues/22" target="_blank" rel="noopener"> underscore 函数节流的实现</a></li>
+<li><a href="http://www.easyui.info/archives/1853.html" target="_blank" rel="noopener"> Underscore之throttle函数源码分析以及使用注意事项
+</a></li>
+<li><a href="https://blog.coding.net/blog/the-difference-between-throttle-and-debounce-in-underscorejs" target="_blank" rel="noopener">浅谈 Underscore.js 中 _.throttle 和 _.debounce 的差异</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/20/underscore源码剖析之数组遍历函数分析（二）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/20/underscore源码剖析之数组遍历函数分析（二）/" itemprop="url">underscore源码剖析之数组遍历函数分析（二）</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-20T22:13:12+08:00">
+                2018-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><p>上一篇主要介绍了each和map这些函数的实现，本篇继续分析reduce的源码。<br>在underscore中有reduce和reduceRight两个方法，reduce是从数组或对象第一项开始遍历，reduceRight则是从最后一项开始遍历。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3, 4];</span><br><span class="line">_.reduce(arr, function(result, item) &#123;</span><br><span class="line">    result += item;</span><br><span class="line">    console.log(result); // 1, 3, 6, 10</span><br><span class="line">    return result;</span><br><span class="line">&#125;, 0)</span><br><span class="line">_.reduceRight(arr, function(result, item) &#123;</span><br><span class="line">    result += item;</span><br><span class="line">    console.log(result); // 4, 7, 9, 10</span><br><span class="line">    return result;</span><br><span class="line">&#125;, 0)</span><br></pre></td></tr></table></figure></p>
+<p>reduce函数有四个参数，分别是list（数组或对象）、iteratee（函数）、memo（初始值）、context（上下文），func函数则会接收四个参数，分别是memo执行后的结果、数组项/对象value、index/key，list，具体用法可以看这里：<a href="http://www.bootcss.com/p/underscore/#reduce" target="_blank" rel="noopener">reduce的用法</a></p>
+<h2 id="createReduce实现"><a href="#createReduce实现" class="headerlink" title="createReduce实现"></a>createReduce实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">_.reduce = _.foldl = _.inject = createReduce(1);</span><br><span class="line">_.reduceRight = _.foldr = createReduce(-1);</span><br><span class="line">// createReduce会根据dir的值来控制遍历方向</span><br><span class="line">function createReduce(dir) &#123;</span><br><span class="line">	function iterator(obj, iteratee, memo, keys, index, length) &#123;</span><br><span class="line">		// 从第index个值开始迭代，dir为1的时候从左往右跌代，dir为-1的时候从右往左跌代        </span><br><span class="line">		// 将每次返回的值赋给memo，以便于下次继续调用，直到走完这个循环，最后返回memo</span><br><span class="line">		for (; index &gt;= 0 &amp;&amp; index &lt; length; index += dir) &#123;</span><br><span class="line">			var currentKey = keys ? keys[index] : index;</span><br><span class="line">			memo = iteratee(memo, obj[currentKey], currentKey, obj);</span><br><span class="line">		&#125;</span><br><span class="line">		return memo;</span><br><span class="line">	&#125;</span><br><span class="line">	// _.reduce传参分别是对象/数组, 函数，初始值，上下文</span><br><span class="line">	// 根据dir的值来判断index的值（从第一个元素还是最后一个元素开始迭代）</span><br><span class="line">	// 如果memo有值，那么就从obj第一个元素迭代</span><br><span class="line">	// 如果没有传入memo和context两个值的时候，需要对memo赋个初始值</span><br><span class="line">	// 也就是说将第一个元素作为初始值给memo，从obj第二个元素开始迭代</span><br><span class="line">	// 或者将最后一个元素作为初始值给memo，从obj倒数第二个元素开始迭代</span><br><span class="line">	return function (obj, iteratee, memo, context) &#123;</span><br><span class="line">	    // 调用optimizeCb，返回一个绑定了context上下文的iteratee</span><br><span class="line">		iteratee = optimizeCb(iteratee, context, 4);</span><br><span class="line">		</span><br><span class="line">		var keys = !isArrayLike(obj) &amp;&amp; _.keys(obj),</span><br><span class="line">			length = (keys || obj).length,</span><br><span class="line">			index = dir &gt; 0 ? 0 : length - 1;</span><br><span class="line">		// 如果没有memo和context</span><br><span class="line">		if (arguments.length &lt; 3) &#123;</span><br><span class="line">			// 如果这里没有传入第三个初始值，那么会把obj里面第一个或最后一个值赋过去</span><br><span class="line">			memo = obj[keys ? keys[index] : index];</span><br><span class="line">			index += dir;</span><br><span class="line">		&#125;</span><br><span class="line">		return iterator(obj, iteratee, memo, keys, index, length);</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>createReduce函数是一个高阶函数，接收了一个dir，通过dir来判断是从list是从左往右遍历还是从右往左遍历，之所以用1和-1是为了后续遍历的时候，直接让index加上dir来实现循环，如果是从左往右遍历，那么dir为1，在for循环中index每次加1，通过访问index或key[index]就可以实现从左往右遍历。如果是从右往左遍历，那么dir为-1，在for循环中index每次减1，这样就实现了从右往左遍历。</p>
+<p>如果没有给reduce传memo这个初始值，则会将list中的第一项或者最后一项赋给memo，之后的迭代从第二项或者倒数第二项开始。</p>
+<p>一共就是下面四种情况：</p>
+<ol>
+<li>如果dir为1，也就是调用reduce的时候，如果传入了memo，那么会从list的第一项开始遍历，将memo和循环中当前的项传给iteratee函数执行，并且将执行结束后的结果重新赋值给memo，这样一直迭代下去，得到最后的memo值。</li>
+<li>如果dir为1，并且没有传入memo，那么会将list中的第一项赋给memo，之后从第二项再开始遍历list。</li>
+<li>如果dir为-1，也就是调用reduceRight的时候，如果传入了memo，那么会从list的最后一项开始遍历。</li>
+<li>如果dir为-1，并且没有传入memo，那么会将list中的最后一项赋给memo，之后从倒数第二项再开始遍历list。<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2>reduce可以有很多很巧妙的用法，某些情况下代替each、map循环也会更加方便，比如计算一个数组中所有项之和的时候，那么reduce还有其他什么用法呢？<h3 id="深层取值"><a href="#深层取值" class="headerlink" title="深层取值"></a>深层取值</h3>我们在平时写代码的时候经常会遇到给对象内部某个属性赋值，但是这个属性在很深的层级里面，如果直接使用.来赋值，只要前面有一个是undefined，后面必报错。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">    info1: &#123;</span><br><span class="line">        age: 20</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var age = obj.info1.age</span><br><span class="line">var name = obj.info2.name // Cannot read property &apos;name&apos; of undefined</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>我们想获取obj下面info2属性的name，但是因为obj里面没有info2，所以obj.info2是undefined，我们访问的是undefined.name，这个时候肯定会报错的，我们只能用obj.info2 &amp;&amp; obj.info2.name的丑陋形式来取值，如果是更深的层级，就需要写更多的&amp;&amp;，所以我们可以使用reduce来封装一个get方法来优雅的深层取值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var get = function(obj, attrArr) &#123;</span><br><span class="line">    return _.reduce(attrArr, function(obj, attr) &#123;</span><br><span class="line">        return obj &amp;&amp; obj[attr]</span><br><span class="line">    &#125;, obj)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们找个例子来试试看：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">	country: &#123;</span><br><span class="line">		name: &quot;china&quot;,</span><br><span class="line">		city: &#123;</span><br><span class="line">			name: &quot;shanghai&quot;,</span><br><span class="line">			street: &#123;</span><br><span class="line">				name: &quot;changning&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">get(obj, [&quot;name&quot;, &quot;name&quot;]) // undefined</span><br><span class="line">get(obj, [&quot;country&quot;, &quot;city&quot;, &quot;name&quot;]) // &quot;shanghai&quot;</span><br><span class="line">get(obj, [&quot;country&quot;, &quot;city&quot;, &quot;street&quot;, &quot;name&quot;]) // &quot;changning&quot;</span><br></pre></td></tr></table></figure></p>
+<h3 id="数组扁平化"><a href="#数组扁平化" class="headerlink" title="数组扁平化"></a>数组扁平化</h3><p>这是之前在一篇博客里面看到的面试题，怎么将下面数组拍平？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, [2, [3, [4]]]]</span><br><span class="line">var arr2 = [[1, 2, 3], [4], [5 ,6 , [7, 8]]]</span><br></pre></td></tr></table></figure></p>
+<p>我们可以用reduce这样写。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var flatten = function(arr) &#123;  </span><br><span class="line">    return _.reduce(arr, function(originArr, item) &#123;</span><br><span class="line">        return originArr.concat(Array.isArray(item) ? flatten(item) : item)</span><br><span class="line">    &#125;, [])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里主要是对数组里面的项进行判断，如果是数组，那么就进行递归，一直到返回一个非数组的值，这样时候将这些值用一个空数组concat起来，最后就得到了一个新的扁平的数组。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/19/深夜思考/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -279,9 +960,9 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
+          <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/19/深夜思考/" itemprop="url">深夜思考</a></h1>
+                <a class="post-title-link" href="/2018/03/19/深夜思考/" itemprop="url">深夜思考</a></h2>
         
 
         <div class="post-meta">
@@ -421,6 +1102,524 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/19/underscore源码剖析之数组遍历函数分析（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/19/underscore源码剖析之数组遍历函数分析（一）/" itemprop="url">underscore源码剖析之数组遍历函数分析（一）</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T22:11:23+08:00">
+                2018-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这是underscore源码剖析系列第三篇文章，主要介绍underscore中each、map、filter、every、reduce等我们常用的一些遍历数组的方法。</p>
+<h2 id="each"><a href="#each" class="headerlink" title="each"></a><strong>each</strong></h2><p>在underscore中我们最常用的就是each和map两个方法了，这两个方法一般接收三个参数，分别是数组/对象、函数、上下文。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// iteratee函数有三个参数，分别是item、index、array或者value、key、obj</span><br><span class="line">_.each = _.forEach = function(obj, iteratee, context) &#123;</span><br><span class="line">    // 如果不传context，那么each方法里面的this就会指向window</span><br><span class="line">    iteratee = optimizeCb(iteratee, context);</span><br><span class="line">    var i, length;</span><br><span class="line">    // 如果是类数组，一般来说包括数组、arguments、DOM集合等等</span><br><span class="line">    if (isArrayLike(obj)) &#123;</span><br><span class="line">        for (i = 0, length = obj.length; i &lt; length; i++) &#123;</span><br><span class="line">            iteratee(obj[i], i, obj);</span><br><span class="line">        &#125;</span><br><span class="line">    // 一般是指对象</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        var keys = _.keys(obj);</span><br><span class="line">        for (i = 0, length = keys.length; i &lt; length; i++) &#123;</span><br><span class="line">            iteratee(obj[keys[i]], keys[i], obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return obj;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>each函数的源码很简单，函数内部会使用isArrayLike方法来判断当前传入的第一个参数是类数组或者对象，如果是类数组，直接使用访问下标的方式来遍历，并将数组的项和index传给iteratee函数，如果是对象，则先获取到对象的keys，再进行遍历后将对象的value和key传给iteratee函数</p>
+<p>不过在这里，我们主要分析optimizeCb和isArrayLike两个函数。</p>
+<h3 id="optimizeCb"><a href="#optimizeCb" class="headerlink" title="optimizeCb"></a>optimizeCb</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">   // 这个函数主要是给传进来的func函数绑定context作用域。</span><br><span class="line">var optimizeCb = function (func, context, argCount) &#123;</span><br><span class="line">    // 如果没有传context，那就直接返回func函数</span><br><span class="line">	if (context === void 0) return func;</span><br><span class="line">	// 如果没有传入argCount，那就默认是3。这里是根据第二次传入的参数个数来给call函数传入不同数量的参数</span><br><span class="line">	switch (argCount == null ? 3 : argCount) &#123;</span><br><span class="line">		case 1: return function (value) &#123;</span><br><span class="line">			return func.call(context, value);</span><br><span class="line">		&#125;;</span><br><span class="line">		case 2: return function (value, other) &#123;</span><br><span class="line">			return func.call(context, value, other);</span><br><span class="line">		&#125;;</span><br><span class="line">		// 一般是each、map等</span><br><span class="line">		case 3: return function (value, index, collection) &#123;</span><br><span class="line">			return func.call(context, value, index, collection);</span><br><span class="line">		&#125;;</span><br><span class="line">		// 一般是reduce等</span><br><span class="line">		case 4: return function (accumulator, value, index, collection) &#123;</span><br><span class="line">			return func.call(context, accumulator, value, index, collection);</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	// 如果参数数量大于4</span><br><span class="line">	return function () &#123;</span><br><span class="line">		return func.apply(context, arguments);</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其实我们很容易就看出来optimizeCb函数只是帮func函数绑定context的，如果不存在context，那么直接返回func，否则则会根据第二次传给func函数的参数数量来判断给call函数传几个值。<br>这里有个重点，为什么要用这么麻烦的方式，而不直接用apply来将arguments全部传进去？<br>原因是call方法的速度要比apply方法更快，因为apply会对数组参数进行检验和拷贝，所以这里就对常用的几种形式使用了call，其他情况下使用了apply，详情可以看这里：<a href="https://segmentfault.com/q/1010000007894513" target="_blank" rel="noopener">call和apply</a></p>
+<h3 id="isArrayLike"><a href="#isArrayLike" class="headerlink" title="isArrayLike"></a>isArrayLike</h3><p>关于isArrayLike方法，我们来看underscore的实现。（这个延伸比较多，如果没兴趣，可以跳过）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// 一个高阶函数，返回对象上某个具体属性的值</span><br><span class="line">var property = function (key) &#123;</span><br><span class="line">	return function (obj) &#123;</span><br><span class="line">		return obj == null ? void 0 : obj[key];</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 这里有个ios8上面的bug，会导致类似var pbj = &#123;1: &quot;a&quot;, 2: &quot;b&quot;, 3: &quot;c&quot;&#125;这种对象的obj.length = 4; jQuery中也有这个bug。</span><br><span class="line">// https://github.com/jashkenas/underscore/issues/2081 </span><br><span class="line">// https://github.com/jquery/jquery/issues/2145</span><br><span class="line">// MAX_SAFE_INTEGER is 9007199254740991 (Math.pow(2, 53) - 1).</span><br><span class="line">// http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer</span><br><span class="line">var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;</span><br><span class="line"></span><br><span class="line">// 据说用obj[&quot;length&quot;]就可以解决？我没有ios8的环境，有兴趣的可以试试</span><br><span class="line">var getLength = property(&apos;length&apos;);</span><br><span class="line"></span><br><span class="line">// 判断是否是类数组，如果有length属性并且值为number类型即可视作类数组</span><br><span class="line">var isArrayLike = function (collection) &#123;</span><br><span class="line">	var length = getLength(collection);</span><br><span class="line">	return typeof length == &apos;number&apos; &amp;&amp; length &gt;= 0 &amp;&amp; length &lt;= MAX_ARRAY_INDEX;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在underscore中，只要带有length属性，都可以被认为是类数组，所以即使是{length: 10}这种情况也会被归为类数组。<br>我个人感觉这样写其实太过片面，我还是更喜欢jQuery里面isArrayLike方法的实现。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function isArrayLike(obj) &#123;</span><br><span class="line">	// Support: real iOS 8.2 only (not reproducible in simulator)</span><br><span class="line">	// `in` check used to prevent JIT error (gh-2145)</span><br><span class="line">	// hasOwn isn&apos;t used here due to false negatives</span><br><span class="line">	// regarding Nodelist length in IE</span><br><span class="line">	var length = !!obj &amp;&amp; &quot;length&quot; in obj &amp;&amp; obj.length,</span><br><span class="line">		type = toType(obj);</span><br><span class="line">	// 排除了obj为function和全局中有length变量的情况</span><br><span class="line">	if (isFunction(obj) || isWindow(obj)) &#123;</span><br><span class="line">		return false;</span><br><span class="line">	&#125;</span><br><span class="line">	return type === &quot;array&quot; || length === 0 ||</span><br><span class="line">		typeof length === &quot;number&quot; &amp;&amp; length &gt; 0 &amp;&amp; (length - 1) in obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>jQuery中使用in来解决ios8下面那个JIT的错误，同时还会排除obj是函数和window的情况，因为如果obj是函数，那么obj.length则是这个函数参数的个数，而如果obj是window，那么我在全局中定义一个var length = 10，这个同样也能获取到length。</p>
+<p>最后的三个判断分别是：</p>
+<ol>
+<li>如果obj的类型是数组，那么返回true</li>
+<li>如果obj的length是0，也返回true。即使是{length: 0}这种情况，因为在调用isArrayLike的each和map等方法中会在for循环里面判断length，所以也不会造成影响。</li>
+<li>最后这个(length - 1) in obj我个人理解就是为了排除{length: 10}这种情况，因为这个可以满足length&gt;0和length===”number”的情况，但是一般情况下是无法满足最后(length - 1) in obj的，但是NodeList和arguments这些却可以满足这个条件。<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2>说完了each，我们再来说说map，map函数其实和each的实现很类似，不过不一样的一个地方在于，map函数的第二个参数不一定是函数，我们可以什么都不传，甚至还可以传个对象。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var arr = [&#123;name:&apos;Kevin&apos;&#125;, &#123;name: &apos;Daisy&apos;, age: 18&#125;]</span><br><span class="line">var result1 = _.map(arr); // [&#123;name:&apos;Kevin&apos;&#125;, &#123;name: &apos;Daisy&apos;, age: 18&#125;]</span><br><span class="line">var result2 = _.map(arr, &#123;name: &apos;Daisy&apos;&#125;) // [false, true]</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>所以这里就会对传入map的第二个参数进行判断，整体来说map函数的实现比each更加简洁。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_.map = _.collect = function (obj, iteratee, context) &#123;</span><br><span class="line">		// 因为在map中，第二个参数可能不是函数，所以用cb，这点和each的实现不一样。</span><br><span class="line">		iteratee = cb(iteratee, context);</span><br><span class="line">		// 如果不是类数组（是对象），则获取到keys</span><br><span class="line">		var keys = !isArrayLike(obj) &amp;&amp; _.keys(obj),</span><br><span class="line">			length = (keys || obj).length,</span><br><span class="line">			results = Array(length);</span><br><span class="line">		// 这里根据keys是否存在来判断传给iteratee是key还是index</span><br><span class="line">		for (var index = 0; index &lt; length; index++) &#123;</span><br><span class="line">			var currentKey = keys ? keys[index] : index;</span><br><span class="line">			results[index] = iteratee(obj[currentKey], currentKey, obj);</span><br><span class="line">		&#125;</span><br><span class="line">		return results;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="cb"><a href="#cb" class="headerlink" title="cb"></a>cb</h3><p>我们来看看map函数中这个cb函数到底是什么来历？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">_.identity = function (value) &#123;</span><br><span class="line">	return value;</span><br><span class="line">&#125;;</span><br><span class="line">var cb = function (value, context, argCount) &#123;</span><br><span class="line">    // 如果value不存在</span><br><span class="line">	if (value == null) return _.identity;</span><br><span class="line">	// 如果传入的是个函数</span><br><span class="line">	if (_.isFunction(value)) return optimizeCb(value, context, argCount);</span><br><span class="line">	// 如果传入的是个对象</span><br><span class="line">	if (_.isObject(value)) return _.matcher(value);</span><br><span class="line">	return _.property(value);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>cb函数在underscore中一般是用在遍历方法中，大多数情况下value都是一个函数，我们结合上面map的源码和例子来看。</p>
+<ol>
+<li>如果value不存在，那就对应上面的<em>.map(obj)的情况，map中的iteratee就是</em>.identity函数，他会将后面接收到的obj[currentKey]直接返回。</li>
+<li>如果value是一个函数，就对应_.map(obj, func)这种情况，那么会再调用optimizeCb方法，这里就和each的实现是一样的</li>
+<li>如果value是个对象，对应<em>.map(obj, arrts)的情况，就会比较obj中的属性是否在arr里面，这个时候会调用</em>.matcher函数</li>
+<li>这种情况一般是用在_.iteratee函数中，用来访问对象的某个属性，具体看这里：<a href="http://www.bootcss.com/p/underscore/#iteratee" target="_blank" rel="noopener">iteratee函数</a><h3 id="matcher"><a href="#matcher" class="headerlink" title="matcher"></a>matcher</h3>那么我们再来看matcher函数，matcher函数内部对两个对象做了浅比较。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">_.matcher = _.matches = function (attrs) &#123;</span><br><span class="line">    // 将attrs和&#123;&#125;合并为一个对象（避免attrs为undefined）</span><br><span class="line">	attrs = _.extendOwn(&#123;&#125;, attrs);</span><br><span class="line">	return function (obj) &#123;</span><br><span class="line">		return _.isMatch(obj, attrs);</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br><span class="line">// isMatch方法会对接收到的attrs对象进行遍历，同时比较obj中是否有这一项</span><br><span class="line">_.isMatch = function (object, attrs) &#123;</span><br><span class="line">	var keys = _.keys(attrs), length = keys.length;</span><br><span class="line">	// 如果object和attr都是空，那么返回true，否则object为空时返回false</span><br><span class="line">	if (object == null) return !length;</span><br><span class="line">	// 这一步没懂是为了做什么？</span><br><span class="line">	var obj = Object(object);</span><br><span class="line">	for (var i = 0; i &lt; length; i++) &#123;</span><br><span class="line">		var key = keys[i];</span><br><span class="line">		if (attrs[key] !== obj[key] || !(key in obj)) return false;</span><br><span class="line">	&#125;</span><br><span class="line">	return true;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>matcher是个高阶方法，他会将两次接收到的对象传给isMatch函数来进行判断。首先是以attrs为被遍历的对象，通过对比obj[key]和attrs[key]的值，只要obj中的值和attrs中的不想等，就会返回false。<br>这里还会排除一种情况，如果attrs中对应key的value正好是undefined，而且obj中并没有key这个属性，这样obj[key]和attrs[key]其实都是undefined，这里使用！==来比较必然会返回false，实际上两者应该是不想等的。<br>所以使用in来判断obj上到底有没有key这个属性，如果没有，也会返回false。如果attrs上面所有属性在obj中都能找到，并且两者的值正好相等，那么就会返回true。<br>这也就是为什么_.map([{name:’Kevin’}, {name: ‘Daisy’, age: 18}], {name: ‘Daisy’}); 会返回 [false, true]。</p>
+<h3 id="重写each"><a href="#重写each" class="headerlink" title="重写each"></a>重写each</h3><p>each和map实现原理基本上一样，不过map更加简洁，这里可以用map的形式重写一下each<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">_.each = _.forEach = function (obj, iteratee, context) &#123;</span><br><span class="line">		iteratee = optimizeCb(iteratee, context);</span><br><span class="line">		var keys = !isArrayLike(obj) &amp;&amp; _.keys(obj),</span><br><span class="line">			length = (keys || obj).length,</span><br><span class="line">			results = Array(length);</span><br><span class="line">		for (var index = 0; index &lt; length; index++) &#123;</span><br><span class="line">			var currentKey = keys ? keys[index] : index;</span><br><span class="line">			iteratee(obj[currentKey], currentKey, obj);</span><br><span class="line">		&#125;</span><br><span class="line">		return obj;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="filter、every、some、reject"><a href="#filter、every、some、reject" class="headerlink" title="filter、every、some、reject"></a>filter、every、some、reject</h2><p>这几种方法的实现和上面的each、map类似，这里就不多做解释了，有兴趣的可以自己去看一下。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/underscore源码剖析之基础方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/17/underscore源码剖析之基础方法/" itemprop="url">underscore源码剖析之基础方法</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T22:10:16+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="underscore源码分析之基础方法"><a href="#underscore源码分析之基础方法" class="headerlink" title="underscore源码分析之基础方法"></a>underscore源码分析之基础方法</h1><hr>
+<p>本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。</p>
+<h2 id="mixin"><a href="#mixin" class="headerlink" title="mixin"></a>mixin</h2><p>在上篇文章<a href="https://segmentfault.com/a/1190000013789060?_ea=3463450" target="_blank" rel="noopener">underscore整体架构分析</a>中，我们讲过<strong>_</strong>上面的方法有两种挂载方式，一个是挂载到<strong>_</strong>构造函数上以_.map(arr)的形式直接调用<strong>（在后文上统称构造函数调用）</strong>，另一种则是挂到_.prototype上以_(arr).map()的形式被实例调用<strong>（在后文上统称原型调用）</strong>。</p>
+<p>翻一遍underscore源码你会发现underscore中的方法都是直接挂到_构造函数上实现的，但是会通过mixin方法来将_上面的方法扩展到_.prototype上面，这样这些方法既可以直接调用，又可以通过实例来调用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">_.mixin = function(obj) &#123;</span><br><span class="line">    // 遍历obj上所有的方法</span><br><span class="line">    _.each(_.functions(obj), function(name) &#123;</span><br><span class="line">        // 保存方法的引用</span><br><span class="line">        var func = _[name] = obj[name];</span><br><span class="line">        _.prototype[name] = function() &#123;</span><br><span class="line">            // 将一开始传入的值放到数组中</span><br><span class="line">            var args = [this._wrapped];</span><br><span class="line">            // 将方法的参数一起push到数组中（这里处理的很好，保证了func方法参数的顺序）</span><br><span class="line">            push.apply(args, arguments);</span><br><span class="line">            // 这里先用apply方法执行了func，并将结果传给了result</span><br><span class="line">            return result(this, func.apply(_, args));</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">_.mixin(_);</span><br></pre></td></tr></table></figure></p>
+<p>从这段代码中我们可以看出，mixin方法将_上的所有方法通过遍历的形式挂载到了_.prototype上面。</p>
+<p>细心观察一下，构造函数调用和原型调用的区别在哪里？<br>没错，区别就在于调用方式和传参，构造函数调用时一般会把要处理的值当做第一个参数传入，而原型调用的时候会把要处理的值传入_构造函数来创建一个实例。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3]</span><br><span class="line">var func = function(item) &#123;</span><br><span class="line">    console.log(item);</span><br><span class="line">&#125;</span><br><span class="line">// 构造函数调用时arr被传入第一个参数</span><br><span class="line">_.each(arr, func)</span><br><span class="line">// 原型调用的时候，arr被当做参数传给_方法来创建一个实例</span><br><span class="line">_(arr).each(func)</span><br><span class="line">// 链式调用，和上面类似</span><br><span class="line">_.chain(arr).each(func)</span><br></pre></td></tr></table></figure></p>
+<p>从上一节中我们知道，在创建一个_的实例时，会用this._wrapped将传入的值保存起来，所以在mixin里面这一句：var args = [this._wrapped];是将我们传给_的值放到args数组第一项中，之后再将arguments也放入args数组中，借助apply方法执行当前遍历的方法（在这个例子中是each），这个时候传给each方法的是arr和func，正好和原来直接_.each调用each传入参数的顺序是一样的（underscore中的方法第一项基本上都是要处理的数据）。</p>
+<h2 id="链式调用"><a href="#链式调用" class="headerlink" title="链式调用"></a>链式调用</h2><p>那么上面最后return result(this, func.apply(_, args))，result又是做什么的呢？</p>
+<p>首先来看result源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var result = function(instance, obj) &#123;</span><br><span class="line">    // 首先判断是否使用链式调用，如果是，那就继续将刚刚执行后返回的结果链式调用一下，如果不是，则直接返回执行后的结果</span><br><span class="line">    return instance._chain ? _(obj).chain() : obj;</span><br><span class="line">&#125;;</span><br><span class="line">_.chain = function(obj) &#123;</span><br><span class="line">    // 创建一个实例</span><br><span class="line">    var instance = _(obj);</span><br><span class="line">    // 给这个实例加个_chain属性来表明这是链式调用</span><br><span class="line">    instance._chain = true;</span><br><span class="line">    return instance;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>我们知道underscore中也是有和jQuery类似的链式调用，来看一下链式调用的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3]</span><br><span class="line">var newArr = _.chain(a).map(function(item) &#123;</span><br><span class="line">    return item + 1</span><br><span class="line">&#125;).filter(function(item) &#123;</span><br><span class="line">    return item &gt; 2</span><br><span class="line">&#125;).value()</span><br></pre></td></tr></table></figure></p>
+<p>链式调用的关键在于每次执行方法后都需要返回一个实例，以确保能够继续调用其他方法。<br>chain方法会用传入的obj创建一个_的实例，这个实例可以调用原型上的方法。从上面mixin的实现来看，每次调用原型方法后会将执行后的结果传给result方法，在result内部会判断你是否使用了链式调用（chain），如果是链式的，那么就会将返回结果链式化（传入chain中创建新的实例）。<br>链式调用一定要在结尾执行value方法，不然最后返回的是一个对象（最后一次创建的_实例）</p>
+<h2 id="数组函数"><a href="#数组函数" class="headerlink" title="数组函数"></a>数组函数</h2><p>underscore构造方法上面并没有直接对push、pop、shift等数组方法进行实现，但是链式调用的时候往往需要用到这些方法，所以在原型上对这些方法做了一些封装，实现方法和mixin类似，这里不再多做解释。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">_.each([&apos;pop&apos;, &apos;push&apos;, &apos;reverse&apos;, &apos;shift&apos;, &apos;sort&apos;, &apos;splice&apos;, &apos;unshift&apos;], function(name) &#123;</span><br><span class="line">    var method = ArrayProto[name];</span><br><span class="line">    _.prototype[name] = function() &#123;</span><br><span class="line">    var obj = this._wrapped;</span><br><span class="line">    method.apply(obj, arguments);</span><br><span class="line">    // 这句是好像是为了解决ie上的bug？</span><br><span class="line">    if ((name === &apos;shift&apos; || name === &apos;splice&apos;) &amp;&amp; obj.length === 0) delete obj[0];</span><br><span class="line">        return result(this, obj);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">_.each([&apos;concat&apos;, &apos;join&apos;, &apos;slice&apos;], function(name) &#123;</span><br><span class="line">    var method = ArrayProto[name];</span><br><span class="line">    _.prototype[name] = function() &#123;</span><br><span class="line">        return result(this, method.apply(this._wrapped, arguments));</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/16/underscore源码剖析之整体架构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/16/underscore源码剖析之整体架构/" itemprop="url">underscore源码剖析之整体架构</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T21:08:56+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="underscore源码分析之整体架构"><a href="#underscore源码分析之整体架构" class="headerlink" title="underscore源码分析之整体架构"></a>underscore源码分析之整体架构</h1><hr>
+<p>最近打算好好看看underscore源码，一个是因为自己确实水平不够，另一个是underscore源码比较简单，比较易读。<br>本系列打算对underscore1.8.3中关键函数源码进行分析，希望做到最详细的源码分析。<br>今天是underscore源码剖析系列第一篇，主要对underscore整体架构和基础函数进行分析。</p>
+<h2 id="基础模块"><a href="#基础模块" class="headerlink" title="基础模块"></a>基础模块</h2><p>首先，我们先来简单的看一下整体的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">// 这里是一个立即调用函数，使用call绑定了外层的this(全局对象)</span><br><span class="line">(function() &#123;</span><br><span class="line"></span><br><span class="line">  var root = this;</span><br><span class="line">  </span><br><span class="line">  // 保存当前环境中已经存在的_变量（在noConflict中用到）</span><br><span class="line">  var previousUnderscore = root._;</span><br><span class="line">  </span><br><span class="line">  // 用变量保存原生方法的引用，以防止这些方法被重写，也便于压缩</span><br><span class="line">  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;</span><br><span class="line"></span><br><span class="line">  var</span><br><span class="line">    push             = ArrayProto.push,</span><br><span class="line">    slice            = ArrayProto.slice,</span><br><span class="line">    toString         = ObjProto.toString,</span><br><span class="line">    hasOwnProperty   = ObjProto.hasOwnProperty;</span><br><span class="line"></span><br><span class="line">  var</span><br><span class="line">    nativeIsArray      = Array.isArray,</span><br><span class="line">    nativeKeys         = Object.keys,</span><br><span class="line">    nativeBind         = FuncProto.bind,</span><br><span class="line">    nativeCreate       = Object.create;</span><br><span class="line"></span><br><span class="line">  var Ctor = function()&#123;&#125;;</span><br><span class="line">  // 内部实现省略</span><br><span class="line">  var _ = function(obj) &#123;&#125;;</span><br><span class="line">  </span><br><span class="line">    // 这里是各种方法的实现（省略）</span><br><span class="line">    </span><br><span class="line">  // 导出underscore方法，如果有exports则用exports导出，如果    没有，则将其设为全局变量</span><br><span class="line">  if (typeof exports !== &apos;undefined&apos;) &#123;</span><br><span class="line">    if (typeof module !== &apos;undefined&apos; &amp;&amp; module.exports) &#123;</span><br><span class="line">      exports = module.exports = _;</span><br><span class="line">    &#125;</span><br><span class="line">    exports._ = _;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    root._ = _;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  // 版本号</span><br><span class="line">  _.VERSION = &apos;1.8.3&apos;;</span><br><span class="line">  </span><br><span class="line">  // 用amd的形式导出</span><br><span class="line">  if (typeof define === &apos;function&apos; &amp;&amp; define.amd) &#123;</span><br><span class="line">    define(&apos;underscore&apos;, [], function() &#123;</span><br><span class="line">      return _;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;.call(this))</span><br></pre></td></tr></table></figure></p>
+<h2 id="全局对象"><a href="#全局对象" class="headerlink" title="全局对象"></a>全局对象</h2><p>这段代码整体比较简单，不过我看后来的underscore版本有一些小改动，主要是将var root = this;替换为下面这句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var root = typeof self == &apos;object&apos; &amp;&amp; self.self === self &amp;&amp; self || typeof global == &apos;object&apos; &amp;&amp; global.global === global &amp;&amp; global || this;</span><br></pre></td></tr></table></figure></p>
+<p>这里增加了对self和global的判断，self属性可以返回对窗口自身的引用，等价于window，这里主要是为了兼容web worker，因为web worker中是没有window的，global则是为了兼容node，而且在严格模式下，立即执行函数内部的this是undefined。</p>
+<h2 id="void-0-undefined"><a href="#void-0-undefined" class="headerlink" title="void(0) ? undefined"></a>void(0) ? undefined</h2><p>扫一眼源码，我们会发现在源码中并没有见到undefined的出现，反而是用void(0)或者void 0来代替的，那么这个void到底是什么？为什么不能直接用undefined呢？<br>关于void的解释，我们可以看这里：<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/void" target="_blank" rel="noopener">MDN</a><br>void 运算符通常只用于获取 undefined的原始值，一般使用void(0)，因为undefined不是保留字，在低版本浏览器或者局部作用域中是可以被当做变量赋值的，这样就会导致我们拿不到正确的undefined值，在很多压缩工具中都是将undefined用void 0来代替掉了。<br>其实这里不仅是void 0可以拿到undefined，还有其他很多方法也可以拿到，比如0[“ygy”]、Object.__undefined__、Object.__ygy__，这些原理都是访问一个不存在的属性，所以最后一定会返回undefined</p>
+<h2 id="noConflict"><a href="#noConflict" class="headerlink" title="noConflict"></a>noConflict</h2><p>也许有时候我们会碰到这样一种情况，_已经被当做一个变量声明了，我们引入underscore后会覆盖这个变量，但是又不想这个变量被覆盖，还好underscore提供了noConflict这个方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">_.noConflict = function() &#123;</span><br><span class="line">    root._ = previousUnderscore;</span><br><span class="line">    return this;</span><br><span class="line">&#125;;</span><br><span class="line">var underscore = _.noConflict();</span><br></pre></td></tr></table></figure></p>
+<p>显而易见，这里正常保留原来的_变量，并返回了underscore这个方法（this就是_方法）</p>
+<h2 id=""><a href="#" class="headerlink" title="_"></a>_</h2><p>接下来讲到了本文的重点，关于_方法的分析，在看源码之前，我们先熟悉一下_的用法。<br>这里总结的是我日常的用法，如果有遗漏，希望大家补充。<br>一种是直接调用_上的方法，比如_.map([1, 2, 3])，另一种是通过实例访问原型上的方法，比如_([1, 2, 3]).map()，这里和jQuery的用法很像，\$.extend调用jQuery对象上的方法，而\$(“body”).click()则是调用jQuery原型上的方法。</p>
+<p>既然_可以使用原型上面的方法，那么说明执行_函数的时候肯定会返回一个实例。</p>
+<p>这里来看源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// instanceof 运算符用来测试一个对象在其原型链中是否存在一个构造函数的 prototype 属性。</span><br><span class="line">// 我这里有个不够准确但容易理解的说法，就是检查一个对象是否为另一个构造函数的实例，为了更容易理解，下面将全部以XXX是XXX的实例的方式来说。</span><br><span class="line">var _ = function(obj) &#123;</span><br><span class="line">    // 如果obj是_的实例（这种情况我真的没碰到过）</span><br><span class="line">    if (obj instanceof _) return obj;</span><br><span class="line">    // 如果this不是_构造函数的实例，那就以obj为参数 new一个实例（相等于修改了_函数）</span><br><span class="line">    if (!(this instanceof _)) return new _(obj);</span><br><span class="line">    // 对应_([1,2,3])这种情况</span><br><span class="line">    this._wrapped = obj;</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>我先从源码上来解释，这里可以看出来_是一个构造函数，我们都知道，我既可以在构造函数上面增加方法，还可以在原型上面增加方法，前者只能通过构造函数本身访问到，后者由于原型链的存在，可以在构造函数的实例上面访问到。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var Person = function() &#123;</span><br><span class="line">    this.name = &quot;ygy&quot;;</span><br><span class="line">    this.age = 22;</span><br><span class="line">&#125;</span><br><span class="line">Person.say = function() &#123;</span><br><span class="line">    console.log(&quot;hello&quot;)</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.say = function() &#123;</span><br><span class="line">    console.log(&quot;world&quot;)</span><br><span class="line">&#125;</span><br><span class="line">var ygy = new Person();</span><br><span class="line">Person.say(); // hello</span><br><span class="line">ygy.say(); // world</span><br></pre></td></tr></table></figure></p>
+<p>所以我们平时用的_.map就是Person.say()这种用法，而_([1, 2, 3]).map则是ygy.say()这种用法。</p>
+<p>在继续讲这个之前，我们再来复习一下原型的知识，当我们new一个实例的时候到处发生了什么？</p>
+<p>首先，这里会先创建一个空对象，这个空对象继承了构造函数的原型（或者理解为空对象上增加一个指向构造函数原型的指针__proto__），之后会根据实例传入的参数执行一遍构造函数，将构造函数内部的this绑定到这个新对象中，最后返回这个对象，过程和如下类似：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var ygy = &#123;&#125;;</span><br><span class="line">ygy.__proto__ = Person.prototype </span><br><span class="line">// 或者var ygy = Object.create(Person.prototype)</span><br><span class="line">Person.call(ygy);</span><br></pre></td></tr></table></figure></p>
+<p>这样就很好理解了，要是想调用原型上面的方法，必须先new一个实例出来。我们再来分析_方法的源码：<br>_接收一个对象作为参数，如果这个对象是_的一个实例，那么直接返回这个对象。（这种情况我倒是没见过）</p>
+<p>如果this不是_的实例，那么就会返回一个新的实例new _(obj)，这个该怎么理解？<br>我们需要结合例子来看这句话，在_([1, 2, 3])中，obj肯定是指[1, 2, 3]这个数组，那么this是指什么呢？我觉得this是指window，不信你直接执行一下上面例子中的Person()？你会发现在全局作用域中是可以拿到name和age两个属性的。</p>
+<p>那么既然this指向window，那么this肯定不是_的实例，所以this instanceof _必然会返回false，这样的话就会return一个new _([1, 2, 3])，所以_([1, 2, 3])就是new _([1, 2, 3])，从我们前面对new的解释来看，这个过程表现如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;&#125;</span><br><span class="line">obj.__proto__ = _.prototype</span><br><span class="line">// 此时_函数中this的是new _(obj)，this instanceof _是true，所以就不会重新return一个new _(obj)，这样避免了循环调用</span><br><span class="line">_.call(obj) // 实际上做了这一步： obj._wrapped = [1, 2, 3]</span><br></pre></td></tr></table></figure></p>
+<p>这样我们就理解了为什么_([1, 2, 3]).map中map是原型上的方法，因为_([1, 2, 3])是一个实例。</p>
+<p>我这里再提供一个自己实现的_思路，和jQuery的实现类似，这里就不作解释了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var _ = function(obj) &#123;</span><br><span class="line">    return new _.prototype.init(obj)</span><br><span class="line">&#125;</span><br><span class="line">_.prototype = &#123;</span><br><span class="line">    init: function(obj) &#123;</span><br><span class="line">    	this.__wrapped = obj</span><br><span class="line">    	return this</span><br><span class="line">    &#125;,</span><br><span class="line">    name: function(name) &#123;</span><br><span class="line">        console.log(name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">_.prototype.init.prototype = _.prototype;</span><br><span class="line">var a = _([1, 2, 3])</span><br><span class="line">a.name(&quot;ygy&quot;); // ygy</span><br></pre></td></tr></table></figure></p>
+<p>underscore中所有方法都是在_方法上面直接挂载的，并且用mixin方法将这些方法再一次挂载到了原型上面。不过，由于篇幅有限，mixin方法的实现会在后文中给大家讲解。<br>如果本文有错误和不足之处，希望大家指出。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/01/毕业二三事/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -438,9 +1637,9 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
+          <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/07/01/毕业二三事/" itemprop="url">毕业二三事</a></h1>
+                <a class="post-title-link" href="/2017/07/01/毕业二三事/" itemprop="url">毕业二三事</a></h2>
         
 
         <div class="post-meta">
@@ -588,9 +1787,9 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
+          <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/04/19/梦境小说/" itemprop="url">梦境小说</a></h1>
+                <a class="post-title-link" href="/2015/04/19/梦境小说/" itemprop="url">梦境小说</a></h2>
         
 
         <div class="post-meta">
@@ -745,7 +1944,7 @@
                 alt="尹光耀" />
             
               <p class="site-author-name" itemprop="name">尹光耀</p>
-              <p class="site-description motion-element" itemprop="description">有两种生活，一种是燃烧，一种是腐烂。</p>
+              <p class="site-description motion-element" itemprop="description"></p>
           </div>
 
           <nav class="site-state motion-element">
@@ -755,7 +1954,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -766,7 +1965,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -777,7 +1976,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -787,6 +1986,34 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-segmentfault"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
           
 
           
@@ -999,6 +2226,9 @@
   
 
   
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
 
   
 
