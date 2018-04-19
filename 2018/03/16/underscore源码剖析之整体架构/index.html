@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="世界变了样">
 <meta property="og:description" content="underscore源码分析之整体架构 最近打算好好看看underscore源码，一个是因为自己确实水平不够，另一个是underscore源码比较简单，比较易读。本系列打算对underscore1.8.3中关键函数源码进行分析，希望做到最详细的源码分析。今天是underscore源码剖析系列第一篇，主要对underscore整体架构和基础函数进行分析。 基础模块首先，我们先来简单的看一下整体的代码">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-19T05:34:15.091Z">
+<meta property="og:updated_time" content="2018-04-19T07:29:48.651Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="underscore源码剖析之整体架构">
 <meta name="twitter:description" content="underscore源码分析之整体架构 最近打算好好看看underscore源码，一个是因为自己确实水平不够，另一个是underscore源码比较简单，比较易读。本系列打算对underscore1.8.3中关键函数源码进行分析，希望做到最详细的源码分析。今天是underscore源码剖析系列第一篇，主要对underscore整体架构和基础函数进行分析。 基础模块首先，我们先来简单的看一下整体的代码">
@@ -384,7 +384,8 @@
 <p>这样我们就理解了为什么_([1, 2, 3]).map中map是原型上的方法，因为_([1, 2, 3])是一个实例。</p>
 <p>我这里再提供一个自己实现的_思路，和jQuery的实现类似，这里就不作解释了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var _ = function(obj) &#123;</span><br><span class="line">    return new _.prototype.init(obj)</span><br><span class="line">&#125;</span><br><span class="line">_.prototype = &#123;</span><br><span class="line">    init: function(obj) &#123;</span><br><span class="line">    	this.__wrapped = obj</span><br><span class="line">    	return this</span><br><span class="line">    &#125;,</span><br><span class="line">    name: function(name) &#123;</span><br><span class="line">        console.log(name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">_.prototype.init.prototype = _.prototype;</span><br><span class="line">var a = _([1, 2, 3])</span><br><span class="line">a.name(&quot;ygy&quot;); // ygy</span><br></pre></td></tr></table></figure></p>
 <p>underscore中所有方法都是在_方法上面直接挂载的，并且用mixin方法将这些方法再一次挂载到了原型上面。不过，由于篇幅有限，mixin方法的实现会在后文中给大家讲解。<br>如果本文有错误和不足之处，希望大家指出。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
       
     </div>
     

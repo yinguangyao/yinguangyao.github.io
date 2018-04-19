@@ -378,7 +378,8 @@
 <h2 id="indexOf"><a href="#indexOf" class="headerlink" title="indexOf"></a>indexOf</h2><p>indexOf函数接收array、value和isSorted三个参数。<br>indexOf返回value在该 array 中的索引值，如果value不存在 array中就返回-1。<br>使用原生的indexOf 函数，除非它失效。如果您正在使用一个大数组，你知道数组已经排序，传递true给isSorted将更快的用sortedIndex二分查找..,或者，传递一个数字作为第三个参数，为了在给定的索引的数组中寻找第一个匹配值。<br>lastIndexOf接收array、value和fromIndex三个参数。<br>lastIndexOf返回value在该 array 中的从最后开始的索引值，如果value不存在 array中就返回-1。如果支持原生的lastIndexOf，将使用原生的lastIndexOf函数。 传递fromIndex将从你给定的索性值开始搜索。<br>给下面返回值编上号，以便后面可以直接拿来讲。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3, 2, 4, 5]</span><br><span class="line">var index1 = _.indexOf(arr, 2) // 1</span><br><span class="line">// 如果传了索引值为2，那就是从索引为2的地方开始搜索</span><br><span class="line">// 如果不传第三个参数，可以理解为默认是从0开始搜索</span><br><span class="line">var index2 = _.indexOf(arr, 2, 2) // 3</span><br><span class="line">// 从索引为-1的地方查找意思就是从length-2的索引开始查找</span><br><span class="line">var index3 = _.indexOf(arr, 2, -1)</span><br><span class="line"></span><br><span class="line">// lastIndexOf是从数组末尾反向查询，返回第一个查询到的索引值</span><br><span class="line">var index4 = _.lastIndexOf(arr, 2) // 3</span><br><span class="line"></span><br><span class="line">// 如果传了索引值（比如下面的4），意味着将截取数组里面0-4的部分</span><br><span class="line">// 将这部分当作新数组，从数组末尾反向查询，返回第一个查询到的索引值</span><br><span class="line">// 当然这个查询到的索引值还是按照原来数组来看的，以下面这个为例，传入了4</span><br><span class="line">// 意味着从1,2,3,2,4中反向查询2，查询到的第一个2在原arr数组中索引为3</span><br><span class="line">//其实个人理解类似于如果我不传第三个参数，那就默认的是6（arr的长度）</span><br><span class="line">var index5 = _.lastIndexOf(arr, 2, 4) // 3</span><br><span class="line"></span><br><span class="line">// 这种情况下传入-1类似于传入5，因为如果不传第三个参数，其实类似于从index为6开始反向查的，传入负值就是从fromIndex+arr.length开始搜索</span><br><span class="line">var index6 = _.lastIndexOf(arr, 2, -1)</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://pic1.zhimg.com/80/v2-49801dd40b6c27e54726fc7f0aed23d6_hd.jpg" alt="图示"><br>可能上面有点绕，这里我们再看一下源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">_.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);</span><br><span class="line">_.lastIndexOf = createIndexFinder(-1, _.findLastIndex);</span><br><span class="line">function createIndexFinder(dir, predicateFind, sortedIndex) &#123;</span><br><span class="line">    // idx有可能是布尔类型（isSorted）和数字类型</span><br><span class="line">	return function (array, item, idx) &#123;</span><br><span class="line">		var i = 0, length = getLength(array);</span><br><span class="line">		// 如果idx是数字类型，那就是从某个索引开始搜索</span><br><span class="line">		if (typeof idx == &apos;number&apos;) &#123;</span><br><span class="line">		    // dir大于0的时候是从左到右查询（indexOf）</span><br><span class="line">			if (dir &gt; 0) &#123;</span><br><span class="line">				// 这里对idx进行了处理，如果idx为负数，那就从加上length的索引开始算</span><br><span class="line">				// idx为负数对应上面的index3的情况</span><br><span class="line">				i = idx &gt;= 0 ? idx : Math.max(idx + length, i);</span><br><span class="line">			// dir小于0的时候是从右到左查询（lastIndexOf）</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				// 从index开始反向查找，如果idx为正，那么不能超过数组长度</span><br><span class="line">				// 如果idx为负，那就取idx+length+1（这里之所以+1是为了兼容后面for循环里面的-1，因为如果什么都不传的情况下，循环肯定是从0到length-1）</span><br><span class="line">				length = idx &gt;= 0 ? Math.min(idx + 1, length) : Math.max(idx, idx + length + 1);</span><br><span class="line">			&#125;</span><br><span class="line">		// 如果idx为布尔类型，那么就使用sortedIndex二分查找</span><br><span class="line">		&#125; else if (sortedIndex &amp;&amp; idx &amp;&amp; length) &#123;</span><br><span class="line">			// 使用二分法来查找</span><br><span class="line">			idx = sortedIndex(array, item);</span><br><span class="line">			return array[idx] === item ? idx : -1;</span><br><span class="line">		&#125;</span><br><span class="line">		// 如果item是NaN</span><br><span class="line">		if (item !== item) &#123;</span><br><span class="line">		    // 数组里面有可能有NaN，因为NaN不和自身相等，所以这里传入了isNaN的方法来检测</span><br><span class="line">		    // 其实这里面对array.slice(i, length)的每一项都用isNaN来检测了</span><br><span class="line">			idx = predicateFind(slice.call(array, i, length), _.isNaN);</span><br><span class="line">			// 这里之所以加上i，是因为predicateFind函数里面是根据array.slice(i, length)的长度来循环最终获取到index值，</span><br><span class="line">			// 这样其实少算了一段长度为i的数组，这个可以去看createPredicateIndexFinder函数</span><br><span class="line">			return idx &gt;= 0 ? idx + i : -1;</span><br><span class="line">		&#125;</span><br><span class="line">		// 根据上面计算出来的i和length来进行循环</span><br><span class="line">		// 这里不用加上i是因为一开始就是从i或者length-1开始遍历的</span><br><span class="line">		for (idx = dir &gt; 0 ? i : length - 1; idx &gt;= 0 &amp;&amp; idx &lt; length; idx += dir) &#123;</span><br><span class="line">			if (array[idx] === item) return idx;</span><br><span class="line">		&#125;</span><br><span class="line">		return -1;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>原本indexOf只是个简单的方法，只不过这里面考虑到lastIndexOf可以传入负值以及indexOf使用二分查找优化才让人那么难懂。<br>这篇文章如果有什么错误和不足之处，希望大家可以指出，有疑惑也可以直接在评论区提出来。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -540,7 +541,8 @@
 <p>同时，在我们的基础之上，underscore加入了immediate参数。如果传入的immediate为true，那么只会在第一次进来的时候立即执行。很明显在上面代码中func执行只有两处，一个是callNow判断里面，一个是!immediate判断里面，所以这样保证了后续触发不会再执行func。</p>
 <p><strong>参考链接：</strong><br>1、<a href="https://segmentfault.com/a/1190000010983733" target="_blank" rel="noopener">浅谈throttle以及debounce的原理和实现
 </a></p>
-
+<p>  <head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -725,7 +727,8 @@
 </a></li>
 <li><a href="https://blog.coding.net/blog/the-difference-between-throttle-and-debounce-in-underscorejs" target="_blank" rel="noopener">浅谈 Underscore.js 中 _.throttle 和 _.debounce 的差异</a></li>
 </ol>
-
+<p>  <head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -895,7 +898,8 @@
 <h3 id="数组扁平化"><a href="#数组扁平化" class="headerlink" title="数组扁平化"></a>数组扁平化</h3><p>这是之前在一篇博客里面看到的面试题，怎么将下面数组拍平？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, [2, [3, [4]]]]</span><br><span class="line">var arr2 = [[1, 2, 3], [4], [5 ,6 , [7, 8]]]</span><br></pre></td></tr></table></figure></p>
 <p>我们可以用reduce这样写。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var flatten = function(arr) &#123;  </span><br><span class="line">    return _.reduce(arr, function(originArr, item) &#123;</span><br><span class="line">        return originArr.concat(Array.isArray(item) ? flatten(item) : item)</span><br><span class="line">    &#125;, [])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这里主要是对数组里面的项进行判断，如果是数组，那么就进行递归，一直到返回一个非数组的值，这样时候将这些值用一个空数组concat起来，最后就得到了一个新的扁平的数组。</p>
-
+<p>  <head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1054,7 +1058,8 @@
 <p>我总是把自己局限在一个特定的圈子里面，从来都不会去主动认识人，扩大自己的交友圈。之前一个朋友催促我去找女朋友，推荐我使用柏拉图，他说就算你不想找妹纸，找个妹纸聊聊天，分享一下别人的人生和见识不也是很好的吗？</p>
 <p>很多时候我闭上眼睛，在脑海里想像未来的自己，可是我一眼就能看到十年后的自己，我真的很不安很害怕，害怕自己过了十年依然没有什么改变，还是这副死气沉沉的样子。</p>
 <p>哎，希望我能在18年做出改变吧，努力突破自己的技术瓶颈，走出阶段的迷茫。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1235,7 +1240,8 @@
 <p>matcher是个高阶方法，他会将两次接收到的对象传给isMatch函数来进行判断。首先是以attrs为被遍历的对象，通过对比obj[key]和attrs[key]的值，只要obj中的值和attrs中的不想等，就会返回false。<br>这里还会排除一种情况，如果attrs中对应key的value正好是undefined，而且obj中并没有key这个属性，这样obj[key]和attrs[key]其实都是undefined，这里使用！==来比较必然会返回false，实际上两者应该是不想等的。<br>所以使用in来判断obj上到底有没有key这个属性，如果没有，也会返回false。如果attrs上面所有属性在obj中都能找到，并且两者的值正好相等，那么就会返回true。<br>这也就是为什么_.map([{name:’Kevin’}, {name: ‘Daisy’, age: 18}], {name: ‘Daisy’}); 会返回 [false, true]。</p>
 <h3 id="重写each"><a href="#重写each" class="headerlink" title="重写each"></a>重写each</h3><p>each和map实现原理基本上一样，不过map更加简洁，这里可以用map的形式重写一下each<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">_.each = _.forEach = function (obj, iteratee, context) &#123;</span><br><span class="line">		iteratee = optimizeCb(iteratee, context);</span><br><span class="line">		var keys = !isArrayLike(obj) &amp;&amp; _.keys(obj),</span><br><span class="line">			length = (keys || obj).length,</span><br><span class="line">			results = Array(length);</span><br><span class="line">		for (var index = 0; index &lt; length; index++) &#123;</span><br><span class="line">			var currentKey = keys ? keys[index] : index;</span><br><span class="line">			iteratee(obj[currentKey], currentKey, obj);</span><br><span class="line">		&#125;</span><br><span class="line">		return obj;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure></p>
 <h2 id="filter、every、some、reject"><a href="#filter、every、some、reject" class="headerlink" title="filter、every、some、reject"></a>filter、every、some、reject</h2><p>这几种方法的实现和上面的each、map类似，这里就不多做解释了，有兴趣的可以自己去看一下。</p>
-
+<p>  <head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1399,7 +1405,8 @@
 <p>我们知道underscore中也是有和jQuery类似的链式调用，来看一下链式调用的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1, 2, 3]</span><br><span class="line">var newArr = _.chain(a).map(function(item) &#123;</span><br><span class="line">    return item + 1</span><br><span class="line">&#125;).filter(function(item) &#123;</span><br><span class="line">    return item &gt; 2</span><br><span class="line">&#125;).value()</span><br></pre></td></tr></table></figure></p>
 <p>链式调用的关键在于每次执行方法后都需要返回一个实例，以确保能够继续调用其他方法。<br>chain方法会用传入的obj创建一个_的实例，这个实例可以调用原型上的方法。从上面mixin的实现来看，每次调用原型方法后会将执行后的结果传给result方法，在result内部会判断你是否使用了链式调用（chain），如果是链式的，那么就会将返回结果链式化（传入chain中创建新的实例）。<br>链式调用一定要在结尾执行value方法，不然最后返回的是一个对象（最后一次创建的_实例）</p>
 <h2 id="数组函数"><a href="#数组函数" class="headerlink" title="数组函数"></a>数组函数</h2><p>underscore构造方法上面并没有直接对push、pop、shift等数组方法进行实现，但是链式调用的时候往往需要用到这些方法，所以在原型上对这些方法做了一些封装，实现方法和mixin类似，这里不再多做解释。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">_.each([&apos;pop&apos;, &apos;push&apos;, &apos;reverse&apos;, &apos;shift&apos;, &apos;sort&apos;, &apos;splice&apos;, &apos;unshift&apos;], function(name) &#123;</span><br><span class="line">    var method = ArrayProto[name];</span><br><span class="line">    _.prototype[name] = function() &#123;</span><br><span class="line">    var obj = this._wrapped;</span><br><span class="line">    method.apply(obj, arguments);</span><br><span class="line">    // 这句是好像是为了解决ie上的bug？</span><br><span class="line">    if ((name === &apos;shift&apos; || name === &apos;splice&apos;) &amp;&amp; obj.length === 0) delete obj[0];</span><br><span class="line">        return result(this, obj);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">_.each([&apos;concat&apos;, &apos;join&apos;, &apos;slice&apos;], function(name) &#123;</span><br><span class="line">    var method = ArrayProto[name];</span><br><span class="line">    _.prototype[name] = function() &#123;</span><br><span class="line">        return result(this, method.apply(this._wrapped, arguments));</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-
+<p>  <head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1572,7 +1579,8 @@
 <p>这样我们就理解了为什么_([1, 2, 3]).map中map是原型上的方法，因为_([1, 2, 3])是一个实例。</p>
 <p>我这里再提供一个自己实现的_思路，和jQuery的实现类似，这里就不作解释了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var _ = function(obj) &#123;</span><br><span class="line">    return new _.prototype.init(obj)</span><br><span class="line">&#125;</span><br><span class="line">_.prototype = &#123;</span><br><span class="line">    init: function(obj) &#123;</span><br><span class="line">    	this.__wrapped = obj</span><br><span class="line">    	return this</span><br><span class="line">    &#125;,</span><br><span class="line">    name: function(name) &#123;</span><br><span class="line">        console.log(name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">_.prototype.init.prototype = _.prototype;</span><br><span class="line">var a = _([1, 2, 3])</span><br><span class="line">a.name(&quot;ygy&quot;); // ygy</span><br></pre></td></tr></table></figure></p>
 <p>underscore中所有方法都是在_方法上面直接挂载的，并且用mixin方法将这些方法再一次挂载到了原型上面。不过，由于篇幅有限，mixin方法的实现会在后文中给大家讲解。<br>如果本文有错误和不足之处，希望大家指出。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1722,7 +1730,8 @@
 <p>晚上和黎琳妹纸约了饭，她因为生病好久没有回来了，聚餐什么的也没参加，回来的时候大家基本都走了，第一次去酷多喜，除了贵点，其他方面还是挺好的，吃完饭后我赶紧跑到了图书馆，在图书馆随便看看代码，我对面正好是个很可爱漂亮的妹纸，还长的很像李欣悦学妹，我就私戳学妹问你啥时候来信部了哈哈哈哈，当时内心纠结了很久要不要去搭讪，毕竟大学四年还没有搭讪过，觉得挺可惜的，后来又想了想就算搭了讪又怎么样呢，这样把别人当试验品也挺不好的，何况我也不会和她聊天，就在我录图书馆闭馆音乐的时候，妹纸已经悄悄的走了，虽然有些可惜，但为了好好录闭馆音乐，也是很值得了。</p>
 <p>29号早上也没有什么变化，起来后我开始收拾东西，因为明天就要走了，我把旧衣服整理了一下捐到了校门口，之后就很没出息的去打撸吃外卖了，晚上喊上东哥国臣他们一起去吃饭，遗憾的是冯玉乾和郭崎没有去，他们为了和廖龙飞一起（因为廖龙飞和我这边朋友不熟悉），吃完饭的时候杰宝和晨旸在楼上拥抱，哭的很厉害，我也不知道该怎么拉开他们，就喊来了大家，大家看着他们，店主给我们说当年我毕业的时候也是这样，大家把对方送到火车站，买站台票，你们这个时代很好啊，你们可以坐飞机高铁随时找对方，回来的时候我整理了所有东西，整理了很多很多，一直弄到12点多，等翔总打完dota，我们三个就在床上好好聊了聊，关于未来，聊着聊着我就睡着了哈哈哈哈。</p>
 <p>30号早上我第一个醒来，打开播放器听着《合照》，眼泪突然忍不住流了出来，我真的不想离开学校，怕被室友听到，我就跑到卫生间哭，哭完后装作什么都没发生回到位置上，翻翻以前的照片，这个时候杰宝醒了，他起来就去了405，过了一会儿晨旸也来我们寝室了，他要走了，杰宝把他送到了楼下，我也开始收拾收拾东西，因为马上就轮到我走了，这个时候我听到杰宝在床上哭，我去安慰他，我们以后还有机会见面，别哭了，他说我把你送走吧，我说好，他提着我的箱子把我送到了楼下，走的时候我们拥抱了一下，我拉着箱子离开寝室大楼，我回头看了看，他还在那里没走，我也挺难过的，走到二食堂的时候我拿手机拍了周围的环境和人，这大概是我最后一次看这里了，我的学生生活也就这样结束了。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
@@ -1869,7 +1878,8 @@
 <p>“以后再给你讲，现在快走。”，蔡汶宾拉着潘琳珊跳出阳台，”还好这里是二楼，不过他们马上也会追过来的，我们快走”。</p>
 <p>潘琳珊上气不接下气的跟在蔡汶宾的身后。</p>
 <p>“我的车就停在前面，我们快上车”。蔡汶宾边说边不时回头看。</p>
-
+<p><head><br>    …<br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br>    …<br></head></p>
+<body><br>    …<br>    <div id="comment"></div><br></body>
           
         
       
