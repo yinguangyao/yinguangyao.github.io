@@ -1303,8 +1303,8 @@
 .fa-zhihu {
   display: inline-block;
   margin-right: 5px!important;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   background: url('../../images/zhihu.svg') no-repeat center;
 }
 .fa-zhihu:before {
