@@ -304,6 +304,136 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/24/50行代码实现模板引擎/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/24/50行代码实现模板引擎/" itemprop="url">50行代码实现模板引擎</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-24T10:35:40+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/24/50行代码实现模板引擎/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/04/24/50行代码实现模板引擎/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>不久前看过一篇不错的文章，作者用了15行代码就实现了一个简单的模板引擎，我觉得很有趣，这里是传送门：<a href="https://segmentfault.com/a/1190000005705169" target="_blank" rel="noopener">只有20行的Javascript模板引擎</a><br>这个模板引擎实现的核心点是利用正则表达式来匹配到模板语法里面的变量和JS语句，再将这些匹配到的字段push到一个数组中，最后连接起来，用Function来解析字符串，最后将执行后的结果放到指定DOM节点的innerHTML里面。<br>但是这个模板引擎还是有很多不足，比如不支持取余运算，不支持自定义模板语法，也不支持if、for、switch之外的JS语句，缺少HTML实体编码。<br>恰好我这阵子也在看underscore源码，于是就参考了一下underscore中template方法的实现。<br>这个是我自己写demo的时候实现的一个模板引擎，依然还存在上面那些问题。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">(function () &#123;</span><br><span class="line">    const root = this;</span><br><span class="line">    let match, index = 0, code = &quot;const arr = [];&quot;</span><br><span class="line">    let evaluate = /&lt;%([\s\S]+?)%&gt;/g, reJs = /^( )?(for|if|switch|case|else|break|&#123;|&#125;)(.*)/g</span><br><span class="line">    const escapes = &#123;</span><br><span class="line">        &quot;&apos;&quot;: &quot;&apos;&quot;,</span><br><span class="line">        &apos;&quot;&apos;: &apos;&quot;&apos;,</span><br><span class="line">        &apos;\\&apos;: &apos;\\&apos;,</span><br><span class="line">        &apos;\r&apos;: &apos;r&apos;,  </span><br><span class="line">        &apos;\n&apos;: &apos;n&apos;,</span><br><span class="line">        &apos;\u2028&apos;: &apos;u2028&apos;, </span><br><span class="line">        &apos;\u2029&apos;: &apos;u2029&apos; </span><br><span class="line">      &#125;;</span><br><span class="line">    const escapeChar = (escape) =&gt; &#123;</span><br><span class="line">        return &apos;\\&apos; + escapes[escape];</span><br><span class="line">    &#125;</span><br><span class="line">    const escaper = /\\|&apos;|&quot;|\r|\n|\u2028|\u2029/g;</span><br><span class="line">    const add = (str, bool) =&gt; &#123;</span><br><span class="line">        code += bool? str.match(reJs) ? str : &apos;arr.push(&apos; + str + &apos;);&apos; : &apos;arr.push(&quot;&apos; + str.replace(escaper, escapeChar) + &apos;&quot;);\n&apos;</span><br><span class="line">        return add;</span><br><span class="line">    &#125;</span><br><span class="line">    const templateX = function (tpl, obj, newEvaluate) &#123;</span><br><span class="line">        if(newEvaluate)  evaluate = newEvaluate</span><br><span class="line">        while (match = evaluate.exec(tpl)) &#123;</span><br><span class="line">            add(tpl.slice(index, match.index))(match[1], true)</span><br><span class="line">            index = match[0].length + match.index</span><br><span class="line">        &#125;</span><br><span class="line">        add(tpl.slice(index, tpl.length))</span><br><span class="line">        code = &quot;with(obj) &#123;\n&quot; + code + &apos;return arr.join(\&quot;\&quot;)&apos; + &quot;\n&#125;&quot;;</span><br><span class="line">        return new Function(&quot;obj&quot;, code)(obj);</span><br><span class="line">    &#125;</span><br><span class="line">    root.templateX = templateX</span><br><span class="line">&#125;.call(this))</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/24/牡丹亭外/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -407,8 +537,22 @@
       
         
           
-            <p>为救李郎离家园</p>
-<p>谁料皇榜中状元<br>中状元 着红袍<br>帽插宫花好啊<br>好新鲜<br>李郎一梦已过往<br>风流人儿如今在何方<br>从古到今说来话<br>不过是情而已<br>这人间苦什么<br>怕不能遇见你<br>这世界有点假<br>可我莫名爱上她<br>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人假正经啊<br>听歌的人最无情<br>牡丹亭外雨纷纷<br>谁是归人说不准<br>是归人啊你说分明<br>你把我心放哪儿<br>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人假正经啊<br>听歌的人最无情<br>可我最爱是天然<br>风流人儿如今在何方<br>不管是谁啊<br>躲不过 还是情而已<br>你问我怕什么<br>怕不能遇见你<br>是否你走过了我身边<br>恍恍惑惑一瞬间<br>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人断了魂啊<br>听歌的人最无情<br>为救李郎离家园<br>谁料皇榜中状元<br>中状元 着红袍<br>帽插宫花好啊<br>好新鲜</p>
+            <p>为救李郎离家园<br>谁料皇榜中状元</p>
+<p>中状元 着红袍<br>帽插宫花好啊<br>好新鲜</p>
+<p>李郎一梦已过往<br>风流人儿如今在何方</p>
+<p>从古到今说来话<br>不过是情而已</p>
+<p>这人间苦什么<br>怕不能遇见你</p>
+<p>这世界有点假<br>可我莫名爱上她</p>
+<p>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人假正经啊<br>听歌的人最无情</p>
+<p>牡丹亭外雨纷纷<br>谁是归人说不准<br>是归人啊你说分明<br>你把我心放哪儿</p>
+<p>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人假正经啊<br>听歌的人最无情</p>
+<p>可我最爱是天然<br>风流人儿如今在何方</p>
+<p>不管是谁啊<br>躲不过 还是情而已</p>
+<p>你问我怕什么<br>怕不能遇见你</p>
+<p>是否你走过了我身边<br>恍恍惑惑一瞬间</p>
+<p>黄粱一梦二十年<br>依旧是不懂爱也不懂情<br>写歌的人断了魂啊<br>听歌的人最无情</p>
+<p>为救李郎离家园<br>谁料皇榜中状元</p>
+<p>中状元 着红袍<br>帽插宫花好啊<br>好新鲜</p>
 
           
         
@@ -947,175 +1091,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/underscore throttle节流函数分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="尹光耀">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/xiong.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="世界变了样">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/22/underscore throttle节流函数分析/" itemprop="url">underscore throttle节流函数分析</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-22T22:14:47+08:00">
-                2018-03-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
-                    <span itemprop="name">underscore</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/22/underscore throttle节流函数分析/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2018/03/22/underscore throttle节流函数分析/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>这是underscore源码剖析系列第五篇，今天来聊一下throttle和debounce两个函数。</p>
-<h2 id="throttle节流函数"><a href="#throttle节流函数" class="headerlink" title="throttle节流函数"></a>throttle节流函数</h2><p>Javascript中的函数大多数情况下都是用户调用执行的，但是在某些场景下不是用户直接控制的，在这些场景下，函数会被频繁调用，容易造成性能问题。<br>比如在window.onresize事件和window.onScroll事件中，由于用户可以不断地触发，这会导致函数短时间内频繁调用，如果函数中有复杂的计算，很容易就造成性能的问题。<br>这些场景下最主要的问题是触发频率太高，1s内可以触发数次，但是大多数情况下我们并不需要那么高的触发频率，可能只要在500ms内触发一次，这样其实我们可以用setTimeout来解决，在这期间的触发都忽略掉。<br>我们可以先尝试着自己实现一个节流函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  // 自己实现的简单节流函数</span><br><span class="line">function throttle (func, time) &#123;</span><br><span class="line">	var timeout = null,</span><br><span class="line">		context = null,</span><br><span class="line">		args = null</span><br><span class="line">	return function() &#123;</span><br><span class="line">	    context = this</span><br><span class="line">		args = arguments</span><br><span class="line">		// 只要timeout函数存在，所有调用都无视</span><br><span class="line">		if(timeout) return;</span><br><span class="line">		timeout = setTimeout(function() &#123;</span><br><span class="line">			func.apply(context, args)</span><br><span class="line">			clearTimeout(timeout)</span><br><span class="line">			timeout = null</span><br><span class="line">		&#125;, time||500)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>我们实现了一个简单的节流函数，但是还不够完整，如果我想在第一次触发的时候立即执行怎么办？如果我想禁用掉最后一次执行怎么办？underscore中实现了一个比较完整的节流函数。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/22/underscore throttle节流函数分析/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1170,7 +1145,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1192,7 +1167,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
