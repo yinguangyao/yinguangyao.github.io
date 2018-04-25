@@ -167,7 +167,7 @@ function createIndexFinder(dir, predicateFind, sortedIndex) {
 原本indexOf只是个简单的方法，只不过这里面考虑到lastIndexOf可以传入负值以及indexOf使用二分查找优化才让人那么难懂。
 这篇文章如果有什么错误和不足之处，希望大家可以指出，有疑惑也可以直接在评论区提出来。
 
-[1]: https://pic1.zhimg.com/80/v2-49801dd40b6c27e54726fc7f0aed23d6_hd.jpg
+[1]: http://static.zybuluo.com/gyyin/lu0ub8qs9mi8r80jphf9b3vc/indexof.jpg
 
 <head>
     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>

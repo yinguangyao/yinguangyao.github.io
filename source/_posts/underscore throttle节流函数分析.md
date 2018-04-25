@@ -242,10 +242,10 @@ trailing为false时：
   [3]: https://github.com/hanzichi/underscore-analysis/issues/22
   [4]: http://www.easyui.info/archives/1853.html
   [5]: https://blog.coding.net/blog/the-difference-between-throttle-and-debounce-in-underscorejs
-  [6]: https://pic1.zhimg.com/80/v2-7f14598aced570beef335ef7485c56f0_hd.jpg
-  [7]: https://pic2.zhimg.com/80/v2-1bedfe844882f6c1967b4ec9d5029f3f_hd.jpg
-  [8]: https://pic1.zhimg.com/80/v2-e901c58912a573086e6db8bd36b0c2cf_hd.jpg
-  [9]: https://pic4.zhimg.com/80/v2-25ae6fdaa9472253d9b1fbd383edd54a_hd.jpg
+  [6]: http://static.zybuluo.com/gyyin/4wcaqpfe6f2jjgi252gb1omq/leading.jpg
+  [7]: http://static.zybuluo.com/gyyin/j8ansl1zj2ozs3bagf8vg1fz/no%20leading.jpg
+  [8]: http://static.zybuluo.com/gyyin/9htepogt26ygnykj2kd295b9/trailing.jpg
+  [9]: http://static.zybuluo.com/gyyin/rg9pwy7zj9so31f67ffswu7b/no%20trailing.jpg
 
   <head>
     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>

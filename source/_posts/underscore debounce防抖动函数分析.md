@@ -100,8 +100,8 @@ underscore的实现比较巧妙，为了防止出现我们上面那种不停地�
 
 
   [1]: https://segmentfault.com/a/1190000010983733
-  [2]: https://pic1.zhimg.com/v2-b702de1108e20324c9fa8c492825a14a_b.gif
-  [3]: https://pic3.zhimg.com/v2-86ef7d20bd65b88884538ade33dfc3c8_b.gif
+  [2]: http://static.zybuluo.com/gyyin/89lhbpusryy84o7ss1mqm9or/no%20debounce.gif
+  [3]: http://static.zybuluo.com/gyyin/0mz3o57q6k2wjv3cyx0zgf4s/debounce.gif
   <head>
     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
     <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
