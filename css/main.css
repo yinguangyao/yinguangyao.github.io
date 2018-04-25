@@ -287,13 +287,6 @@ a:hover {
   color: #222;
   border-bottom-color: #222;
 }
-.post-body a {
-  color: #08c !important;
-  border-bottom: 1px solid #08c !important;
-}
-.post-button a {
-  color: #555 !important;
-}
 blockquote {
   margin: 0;
   padding: 0;
@@ -1950,7 +1943,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #01a749;
+  background: #ffffd6;
 }
 .links-of-blogroll {
   font-size: 13px;
