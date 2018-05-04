@@ -304,6 +304,176 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/underscore源码剖析之基础方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/17/underscore源码剖析之基础方法/" itemprop="url">underscore源码剖析之基础方法</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T22:10:16+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/17/underscore源码剖析之基础方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/03/17/underscore源码剖析之基础方法/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。</p>
+<h2 id="mixin"><a href="#mixin" class="headerlink" title="mixin"></a>mixin</h2><p>在上篇文章<a href="https://segmentfault.com/a/1190000013789060?_ea=3463450" target="_blank" rel="noopener">underscore整体架构分析</a>中，我们讲过<strong>_</strong>上面的方法有两种挂载方式，一个是挂载到<strong>_</strong>构造函数上以_.map(arr)的形式直接调用<strong>（在后文上统称构造函数调用）</strong>，另一种则是挂到_.prototype上以_(arr).map()的形式被实例调用<strong>（在后文上统称原型调用）</strong>。</p>
+<p>翻一遍underscore源码你会发现underscore中的方法都是直接挂到_构造函数上实现的，但是会通过mixin方法来将_上面的方法扩展到_.prototype上面，这样这些方法既可以直接调用，又可以通过实例来调用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">_.mixin = function(obj) &#123;</span><br><span class="line">    // 遍历obj上所有的方法</span><br><span class="line">    _.each(_.functions(obj), function(name) &#123;</span><br><span class="line">        // 保存方法的引用</span><br><span class="line">        var func = _[name] = obj[name];</span><br><span class="line">        _.prototype[name] = function() &#123;</span><br><span class="line">            // 将一开始传入的值放到数组中</span><br><span class="line">            var args = [this._wrapped];</span><br><span class="line">            // 将方法的参数一起push到数组中（这里处理的很好，保证了func方法参数的顺序）</span><br><span class="line">            push.apply(args, arguments);</span><br><span class="line">            // 这里先用apply方法执行了func，并将结果传给了result</span><br><span class="line">            return result(this, func.apply(_, args));</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">_.mixin(_);</span><br></pre></td></tr></table></figure></p>
+<p>从这段代码中我们可以看出，mixin方法将_上的所有方法通过遍历的形式挂载到了_.prototype上面。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/17/underscore源码剖析之基础方法/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/16/underscore源码剖析之整体架构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -694,6 +864,17 @@
 
                 
                 
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/电影/个人笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">个人笔记</span>
+                  </a>
+                </span>
+
+                
+                
               
             </span>
           
@@ -933,169 +1114,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/04/19/梦境小说/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="尹光耀">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/xiong.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="世界变了样">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2015/04/19/梦境小说/" itemprop="url">梦境小说</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-04-19T12:54:09+08:00">
-                2015-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/生活/" itemprop="url" rel="index">
-                    <span itemprop="name">生活</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2015/04/19/梦境小说/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2015/04/19/梦境小说/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>“哈哈哈哈！”随着一声怪笑，他的脸变得愈发狰狞。<br>大家都胆战心惊的看着他以及旁边那具腐烂的尸体，所有人都知道再过不久他也会变成这样。<br>此时，在一个公寓里面，潘琳珊刚刚醒来，”你已经昏迷了很久了”，蔡汶宾冷冷的说。潘琳珊忘记了发生了什么，只是感觉浑身无力，头痛欲裂，就像发高烧一样。<br>他走到阳台，想透透气，但是眼前这噩梦般的一幕让他两腿发软。<br>马路上随时都有呕吐不止并且晕倒的人，救护车来来往往，简直就像是世界末日。<br>HE病毒！！！他突然想起来了什么，赶紧回到房间，大笑着对蔡汶宾说：”世界要灭亡了，HE病毒无药可治”</p>
-<p>“不，并不是无药可救，只有……”，蔡汶宾还没说完，门突然被敲响了。”开门！！！让我进去！！快让我进去！！不然我要撞开了！！”，门外那人大嚷着。”糟糕！他们居然这么快就找来了，你快跟我走，我们从这里跳下去。”，蔡汶宾拉着潘琳珊走到阳台。</p>
-<p>“只有什么？你还没有说完呢”，潘琳珊疑惑的问道。</p>
-<p>“以后再给你讲，现在快走。”，蔡汶宾拉着潘琳珊跳出阳台，”还好这里是二楼，不过他们马上也会追过来的，我们快走”。</p>
-<p>潘琳珊上气不接下气的跟在蔡汶宾的身后。</p>
-<p>“我的车就停在前面，我们快上车”。蔡汶宾边说边不时回头看。</p>
-<p><head><br>    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><br>    <script src="//unpkg.com/valine/dist/Valine.min.js"></script><br></head></p>
-<body><br>    <div id="comment"></div><br></body>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1145,7 +1168,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1156,7 +1179,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1167,7 +1190,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
