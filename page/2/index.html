@@ -304,175 +304,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/23/underscore debounce防抖动函数分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="尹光耀">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/xiong.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="世界变了样">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/23/underscore debounce防抖动函数分析/" itemprop="url">underscore debounce防抖动函数分析</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T22:15:06+08:00">
-                2018-03-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
-                    <span itemprop="name">underscore</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/23/underscore debounce防抖动函数分析/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2018/03/23/underscore debounce防抖动函数分析/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本文是underscore源码剖析系列第六篇文章，上节我们介绍了throttle节流函数的实现，这节将会介绍一下节流函数的兄弟 —— debounce防抖动函数。<br>throttle函数是在高频率触发的情况下，为了防止函数的频繁调用，将其限制在一段时间内只会调用一次。而debounce函数则是在频繁触发的情况下，只在触发的最后一次调用一次，想像一下如果我们用手按住一个弹簧，那么只有等到我们把手松开，弹簧才会弹起来，下面我用一个电梯的例子来介绍debounce函数。</p>
-<h2 id="电梯"><a href="#电梯" class="headerlink" title="电梯"></a>电梯</h2><p>假如我下班的时候去坐电梯，等了一段时间后，电梯正准备关上门下降，这个时候一个同事走了过来，电梯门被打开，这样电梯就会继续等一段时间，如果中间一直有人进来，那么电梯就一直不会下降，直到最后一个人进来后过了一定时间后还没有下一个人进来，这时电梯才会下降。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>除了电梯，事实上我们还有很多应用场景，比如我用键盘不断输入文字，我希望等最后一次输入结束后才会调用接口来请求展示联想词，如果每次输入一个字的时候就会调用接口，这样调用未免太过于频繁了。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/23/underscore debounce防抖动函数分析/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/underscore throttle节流函数分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1126,6 +957,176 @@
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/underscore源码剖析之基础方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/xiong.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/17/underscore源码剖析之基础方法/" itemprop="url">underscore源码剖析之基础方法</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T22:10:16+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/underscore/" itemprop="url" rel="index">
+                    <span itemprop="name">underscore</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/17/underscore源码剖析之基础方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/03/17/underscore源码剖析之基础方法/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。</p>
+<h2 id="mixin"><a href="#mixin" class="headerlink" title="mixin"></a>mixin</h2><p>在上篇文章<a href="https://segmentfault.com/a/1190000013789060?_ea=3463450" target="_blank" rel="noopener">underscore整体架构分析</a>中，我们讲过<strong>_</strong>上面的方法有两种挂载方式，一个是挂载到<strong>_</strong>构造函数上以_.map(arr)的形式直接调用<strong>（在后文上统称构造函数调用）</strong>，另一种则是挂到_.prototype上以_(arr).map()的形式被实例调用<strong>（在后文上统称原型调用）</strong>。</p>
+<p>翻一遍underscore源码你会发现underscore中的方法都是直接挂到_构造函数上实现的，但是会通过mixin方法来将_上面的方法扩展到_.prototype上面，这样这些方法既可以直接调用，又可以通过实例来调用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">_.mixin = function(obj) &#123;</span><br><span class="line">    // 遍历obj上所有的方法</span><br><span class="line">    _.each(_.functions(obj), function(name) &#123;</span><br><span class="line">        // 保存方法的引用</span><br><span class="line">        var func = _[name] = obj[name];</span><br><span class="line">        _.prototype[name] = function() &#123;</span><br><span class="line">            // 将一开始传入的值放到数组中</span><br><span class="line">            var args = [this._wrapped];</span><br><span class="line">            // 将方法的参数一起push到数组中（这里处理的很好，保证了func方法参数的顺序）</span><br><span class="line">            push.apply(args, arguments);</span><br><span class="line">            // 这里先用apply方法执行了func，并将结果传给了result</span><br><span class="line">            return result(this, func.apply(_, args));</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">_.mixin(_);</span><br></pre></td></tr></table></figure></p>
+<p>从这段代码中我们可以看出，mixin方法将_上的所有方法通过遍历的形式挂载到了_.prototype上面。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/17/underscore源码剖析之基础方法/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
@@ -1191,7 +1192,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1202,7 +1203,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
