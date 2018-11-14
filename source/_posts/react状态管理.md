@@ -1,5 +1,5 @@
 ---
-title: redux状态管理
+title: react状态管理
 date: 2018-10-05 17:47:30
 categories:
     - 前端
