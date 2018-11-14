@@ -45,7 +45,6 @@ Middleware这个概念是Redux从其他框架借鉴过来的，本意如下：
 
 applyMiddleware函数就更加简练了一些，我们一般会把redux-thunk、redux-logger这种中间件当做参数传给applyMiddleware。
 redux的中间件是在action触发后执行的，所以中间件内部必须拿到完整的state、dispatch和action，这里使用compose包裹了中间件方法，最终返回了一个新的dispatch，可以理解为这个dispatch是经过中间件加强后的dispatch。
-我之前一直在想，为什么重新执行了一遍createStore，不能直接将getState和dispatch方法传过来吗？但是又想了想，getState和dispatch形成了闭包，这样会导致createStore中的变量一直无法释放，这样倒不如重新创建一个store。
 ## compose
 ![compose.png-80.9kB][5]
 
@@ -148,6 +147,8 @@ const combineReducers = reducers => {
     }
 }
 ```
+## 总结
+redux源码实现很精简，比想象中的还要简单，react-redux在redux基础中多了Provider和connect两个方法，通过context将store传给Provider包裹的组件，之后会再开一篇文章分析react-redux的源码。
   [1]: http://static.zybuluo.com/gyyin/1jibi2tofs7mazu6jfsmxs7s/redux%E5%85%A5%E5%8F%A3.png
   [2]: http://static.zybuluo.com/gyyin/an7e9bhcfayz00zh4etg20w1/createStore.png
   [3]: http://static.zybuluo.com/gyyin/kum9agu106cscpkcp1wbsarb/combineReducers.png
