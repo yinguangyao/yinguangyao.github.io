@@ -2,7 +2,6 @@
 title: redux源码分析
 date: 2018-07-25 23:46:14
 categories:
-    - 前端
     - react
 tags:
     - redux

@@ -2,10 +2,11 @@
 title: underscore源码剖析之基础方法
 date: 2018-03-17 22:10:16
 tags:
-- underscore
-- 前端
-- 编程
-categories: [前端, underscore]
+	- underscore
+	- 前端
+	- 编程
+categories: 
+    - underscore
 ---
 本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。
 ## mixin ##

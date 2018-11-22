@@ -2,10 +2,11 @@
 title: underscore查找索引函数分析
 date: 2018-03-25 22:16:51
 tags:
-- underscore
-- 前端
-- 编程
-categories: [前端, underscore]
+	- underscore
+	- 前端
+	- 编程
+categories: 
+	- underscore
 ---
 这是underscore源码剖析系列第七篇文章，这篇文章主要介绍underscore中查找数组中某一项索引或者对象中某个key的函数。
 ## find ##

@@ -2,10 +2,11 @@
 title: underscore源码剖析之数组遍历函数分析（一）
 date: 2018-03-19 22:11:23
 tags:
-- underscore
-- 前端
-- 编程
-categories: [前端, underscore]
+	- underscore
+	- 前端
+	- 编程
+categories: 
+	- underscore
 ---
 这是underscore源码剖析系列第三篇文章，主要介绍underscore中each、map、filter、every、reduce等我们常用的一些遍历数组的方法。
 

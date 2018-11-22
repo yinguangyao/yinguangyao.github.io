@@ -5,7 +5,8 @@ tags:
 - polyfill
 - 前端
 - 编程
-categories: [前端, polyfill]
+categories: 
+    - 前端
 ---
 目前的打算还是继续深入前端基础知识，所以打算从polyfill开始做起。
 ## bind函数 ##

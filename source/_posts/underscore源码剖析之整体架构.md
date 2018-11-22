@@ -2,10 +2,11 @@
 title: underscore源码剖析之整体架构
 date: 2018-03-16 21:08:56
 tags:
-- underscore
-- 前端
-- 编程
-categories: [前端, underscore]
+	- underscore
+	- 前端
+	- 编程
+categories: 
+  - underscore
 ---
 最近打算好好看看underscore源码，一个是因为自己确实荒废了基础，另一个是underscore源码比较简单，比较易读。
 本系列打算对underscore1.8.3中关键函数源码进行分析，希望做到最详细的源码分析。

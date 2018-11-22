@@ -6,7 +6,7 @@ tags:
     - 函数式编程
     - javascript
 categories:
-    - 前端
+    - 函数式编程
 ---
 ## js函数柯里化
 
