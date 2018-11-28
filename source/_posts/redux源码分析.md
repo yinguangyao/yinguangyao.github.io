@@ -148,6 +148,7 @@ const combineReducers = reducers => {
 ```
 ## 总结
 redux源码实现很精简，比想象中的还要简单，react-redux在redux基础中多了Provider和connect两个方法，通过context将store传给Provider包裹的组件，之后会再开一篇文章分析react-redux的源码。
+
   [1]: http://static.zybuluo.com/gyyin/1jibi2tofs7mazu6jfsmxs7s/redux%E5%85%A5%E5%8F%A3.png
   [2]: http://static.zybuluo.com/gyyin/an7e9bhcfayz00zh4etg20w1/createStore.png
   [3]: http://static.zybuluo.com/gyyin/kum9agu106cscpkcp1wbsarb/combineReducers.png
