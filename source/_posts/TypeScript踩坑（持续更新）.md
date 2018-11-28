@@ -13,10 +13,22 @@ tags:
 很多第三方库已经有自己的类型声明文件，比如@types/react，@types/react-native，这些需要单独安装，而例如mobx-react和mobx这种会自带类型文件，不需要单独安装。
 
 我们最近有个新项目，需要照顾到不同同学，有的愿意用TS，有的不想用TS，为了照顾到双方，所有的公共模块都是JS写的，所以需要单独为TS写类型声明文件，具体语法请参考TS官网的文档，这里只是讲一些坑。
-
+#### 集中管理，相对路径导入
 为项目中的JS写类型文件的时候，需要先引入对应的文件，然后以导入的路径为名字声明一个模块，最后在需要用到这个类型文件的地方用///来引入相对路径。
+目录结构如下：
+```
+- @types
+    - BasePage.d.ts
+- src
+    - frame
+        - BasePage.js
+    - page
+        - hotelList
+            - index.tsx
+```
 类型声明文件：
 ```
+// BasePage.d.ts
 import BasePage from '../src/frame/BasePage'
 declare module "../src/frame/BasePage" {
     export default class BasePage{}
@@ -24,9 +36,27 @@ declare module "../src/frame/BasePage" {
 ```
 引入类型文件：
 ```
+// index.tsx
 /// <reference path="../../../@types/BasePage.d.ts" />
 ```
 如果是想设置全局的类型文件，可以在tsconfig.json的paths字段里面指定对应的路径，这样就不需要单独用reference引入了。
+#### 自动导入
+上面那种方法虽然可以将types文件集中管理，但是有个很麻烦的地方就是需要在引入BasePage模块的地方手动引入d.ts文件，这个真的很繁琐，这里有个更好的方法。
+```
+- src
+    - frame
+        - BasePage.js
+        - BasePage.d.ts
+    - page
+        - hotelList
+            - index.tsx
+```
+index.tsx文件直接import导入BasePage就行了，不需要再专门引入BasePage.d.ts，这里两者命名一样，所以会自动识别BasePage.d.ts，但是BasePage.d.ts的语法也变化了一些。
+```
+// BasePage.d.ts
+// 注意：这里不需要再声明declare module "BasePage"了，否则会识别不了
+export default class BasePage{}
+```
 <!-- more -->
 ## 语法
 ### 1. Element implicitly has an 'any' type because type 'Test' has no index signature
