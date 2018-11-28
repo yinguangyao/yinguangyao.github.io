@@ -99,6 +99,7 @@ _.each(['concat', 'join', 'slice'], function(name) {
     };
 });
 ```
+
   [1]: https://segmentfault.com/a/1190000013789060?_ea=3463450
   <head> 
     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
