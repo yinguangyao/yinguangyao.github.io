@@ -5,8 +5,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-    - underscore
+categories: [前端, underscore]
 ---
 本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。
 ## mixin ##

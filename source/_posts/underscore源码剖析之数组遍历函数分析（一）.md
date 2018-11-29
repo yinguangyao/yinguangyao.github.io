@@ -5,8 +5,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-	- underscore
+categories: [前端, underscore]
 ---
 这是underscore源码剖析系列第三篇文章，主要介绍underscore中each、map、filter、every、reduce等我们常用的一些遍历数组的方法。
 

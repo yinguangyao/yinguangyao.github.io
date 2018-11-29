@@ -6,8 +6,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-	- underscore
+categories: [前端, underscore]
 ---
 这是underscore源码剖析系列第五篇，今天来聊一下throttle和debounce两个函数。
 ## throttle节流函数 ##

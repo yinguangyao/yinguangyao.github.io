@@ -1,8 +1,7 @@
 ---
 title: react查漏补缺
 date: 2018-11-25 11:52:01
-categories:
-    - react
+categories: [前端, react]
 tags:
     - react
     - 前端

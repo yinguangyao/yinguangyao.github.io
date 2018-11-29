@@ -1,8 +1,7 @@
 ---
 title: TypeScript踩坑（持续更新）
 date: 2018-11-22 19:26:05
-categories:
-    - TypeScript
+categories: [前端, TypeScript]
 tags:
     - TypeScript
     - 前端
