@@ -39,6 +39,7 @@ declare module "../src/frame/BasePage" {
 /// <reference path="../../../@types/BasePage.d.ts" />
 ```
 如果是想设置全局的类型文件，可以在tsconfig.json的paths字段里面指定对应的路径，这样就不需要单独用reference引入了。
+<!-- more -->
 #### 自动导入
 上面那种方法虽然可以将types文件集中管理，但是有个很麻烦的地方就是需要在引入BasePage模块的地方手动引入d.ts文件，这个真的很繁琐，这里有个更好的方法。
 ```
@@ -56,7 +57,6 @@ index.tsx文件直接import导入BasePage就行了，不需要再专门引入Bas
 // 注意：这里不需要再声明declare module "BasePage"了，否则会识别不了
 export default class BasePage{}
 ```
-<!-- more -->
 ## 语法
 ### 1. Element implicitly has an 'any' type because type 'Test' has no index signature
 ```
@@ -119,6 +119,11 @@ export {default as Header} from './Header'
 ```
 export { Hotel } from './Hotel'
 export * from './Hotel
+```
+##  error TS2322: Type '(string | RegisteredStyle<ViewStyle | TextStyle | ImageStyle>)[]' is not assignable to type 'StyleProp<ViewStyle>'.
+这里是View使用的style类型问题，类似的还有Text、TouchableOpacity，这里需要类型断言，改为如下:
+```
+<Text style={[styles.subText, index == subActive ? styles.subActiveText : ""] as TextStyle} >{item}</Text>
 ```
 
   [1]: https://image-static.segmentfault.com/387/530/3875307783-5bf6970920056_articlex
