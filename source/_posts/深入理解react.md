@@ -1,5 +1,5 @@
 ---
-title: react查漏补缺
+title: 深入理解react
 date: 2018-11-25 11:52:01
 categories: [前端, react]
 tags:
@@ -35,9 +35,7 @@ react中的diff会根据子组件的key来对比前后两次virtual dom（即使
 ## cloneElement
 原来对cloneElement的理解就是类似cloneElement(App, {})这种写法，现在看了实现之后才理解。原来第一个参数应该是一个reactElement，而不是一个reactComponent，应该是`<App />`，而不是App，这个也确实是我没有好好看文档。
 ## setState
-在react中为了防止多次setState导致多次渲染带来不必要的性能开销，所以会将待更新的state放到队列中，等到合适的时机（一般是组件第一次渲染或触发事件后）后进行batchUpdate，所以在setState后无法立即拿到更新后的state，很多人说setState是异步的，setState表现确实是异步，只是里面没有用异步代码实现。
-如果是给setState传入一个函数，这个函数是执行前一个setState后才被调用的，所以函数返回的参数可以拿到更新后的state。
-但是如果将setState在异步方法中（setTimeout、Promise等等）调用，由于方法是异步的，会导致组件pending结束后才执行异步方法中的setState，这个时候由于组件已经不处于pending状态了，会导致setState立即执行，这时通过this.state可以拿到最新的值。
+react里面setState后不会立即更新，但在某些场景下也会立即更新，下面这几种情况打印的值你都能回答的上来吗？
 ```
 class App extends React.Component {
     state = {
@@ -104,12 +102,19 @@ class App extends React.Component {
     }
 }
 ```
+在react中为了防止多次setState导致多次渲染带来不必要的性能开销，所以会将待更新的state放到队列中，等到合适的时机（一般是组件第一次渲染或触发事件后）后进行batchUpdate，所以在setState后无法立即拿到更新后的state，很多人说setState是异步的，setState表现确实是异步，只是里面没有用异步代码实现。
+如果是给setState传入一个函数，这个函数是执行前一个setState后才被调用的，所以函数返回的参数可以拿到更新后的state。
+但是如果将setState在异步方法中（setTimeout、Promise等等）调用，由于方法是异步的，会导致组件pending结束后才执行异步方法中的setState，这个时候由于组件已经不处于pending状态了，会导致setState立即执行，这时通过this.state可以拿到最新的值。
+
 ## ref
 ref用到原生的标签上，可以直接在组件内部用this.refs.xxx的方法获取到真实DOM。
 ref用到组件上，需要用ReactDOM.findDOMNode(this.refs.xxx)的方式来获取到这个组件对应的DOM节点。
 ## shouldComponentUpdate
 当shouldComponentUpdate返回false的时候，组件没有重新渲染，但是更新后的state和props已经挂载到了组件上面，这个时候如果打印state和props，会发现拿到的已经是更新后的了。
-
+## 合成事件
+react里面将可以冒泡的事件委托到了document上，通过向上遍历父节点模拟了冒泡的机制。
+比如当触发onClick事件时，会先执行target元素的onClick事件回调函数，如果回调函数里面阻止了冒泡，就不会继续向上查找父元素。否则，就会继续向上查找父元素，并执行其onClick的回调函数。
+当跳出循环的时候，就会开始进行组件的批量更新（如果没有收到新的props或者state队列为空就不会进行更新）。
 
 
 
