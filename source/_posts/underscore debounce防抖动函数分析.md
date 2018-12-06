@@ -5,8 +5,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-	- underscore
+categories: [前端, underscore]
 ---
 本文是underscore源码剖析系列第六篇文章，上节我们介绍了throttle节流函数的实现，这节将会介绍一下节流函数的兄弟 —— debounce防抖动函数。
 throttle函数是在高频率触发的情况下，为了防止函数的频繁调用，将其限制在一段时间内只会调用一次。而debounce函数则是在频繁触发的情况下，只在触发的最后一次调用一次，想像一下如果我们用手按住一个弹簧，那么只有等到我们把手松开，弹簧才会弹起来，下面我用一个电梯的例子来介绍debounce函数。

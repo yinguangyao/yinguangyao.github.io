@@ -5,8 +5,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-	- underscore
+categories: [前端, underscore]
 ---
 ## 用法 ##
 

@@ -5,8 +5,7 @@ tags:
 	- underscore
 	- 前端
 	- 编程
-categories: 
-    - underscore
+categories: [前端, underscore]
 ---
 本文是underscore源码剖析系列的第二篇，主要介绍underscore中一些基础方法的实现。
 ## mixin ##
@@ -99,6 +98,7 @@ _.each(['concat', 'join', 'slice'], function(name) {
     };
 });
 ```
+
   [1]: https://segmentfault.com/a/1190000013789060?_ea=3463450
   <head> 
     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
