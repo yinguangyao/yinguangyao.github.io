@@ -20,14 +20,11 @@ const Test = (props) => <h1>hello, {props.name}</h1>;
 // 1. babel解析jsx
 <Test name="world"> -> createElement(Test, {name: "world"})
 // 2. 对函数组件和class组件进行处理
-// 如果是类组件，不做处理，如果是函数组件，增加render方法
 const props = {name: world};
 const newTest = new Component(props);
-newTest.render = function() {
-    return Test(props);
-}
-// 3. 执行render方法
+// 3. 执行render方法（函数组件直接执行）
 newTest.render();
+// Test(props);
 ```
 ## key
 react中的diff会根据子组件的key来对比前后两次virtual dom（即使前后两次子组件顺序打乱，也能根据key来匹配到），所以这里的key最好使用不会变化的值，比如id之类的，最好别用index，如果有两个子组件互换了位置，那么index就会导致diff全部失效。
