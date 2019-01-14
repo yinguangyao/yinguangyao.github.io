@@ -10,13 +10,13 @@ tags:
 最近在看react-lite源码，发觉以前对react的理解实在浮浅，这里基于对react-lite的理解记录了一些以前疏忽的点。
 ## createElement和component
 在react里面，经过babel的解析后，jsx会变成createElement执行后的结果。
-```
+```javascript
 const Test = (props) => <h1>hello, {props.name}</h1>;
 <Test name="world" />
 ```
 `<Test name="world" />`经过babel解析后会变为createElement(Test, {name: "world})，这里的Test就是上面的Test方法，name就是Test方法里面接受的props中的name。
 实际上当我们从开始加载到渲染的时候做了下面几步：
-```
+```javascript
 // 1. babel解析jsx
 <Test name="world"> -> createElement(Test, {name: "world"})
 // 2. 对函数组件和class组件进行处理
@@ -31,9 +31,41 @@ react中的diff会根据子组件的key来对比前后两次virtual dom（即使
 <!-- more -->
 ## cloneElement
 原来对cloneElement的理解就是类似cloneElement(App, {})这种写法，现在看了实现之后才理解。原来第一个参数应该是一个reactElement，而不是一个reactComponent，应该是`<App />`，而不是App，这个也确实是我没有好好看文档。
+## 短路操作符判断
+为什么布尔类型和null类型的值可以这么写，而数字类型却不行？
+```javascript
+showLoading && <Loading />
+```
+如果showLoading是个数字0，那么最后渲染出来的居然是个0，但是showLoading是个false或者null，最后就什么都不渲染，这个是为什么？ 首先上述代码会被babel编译为如下格式：
+
+```javascript
+showLoading && React.createElement(Loading, null)
+```
+而如果showLoading是false或者0的时候，就会短路掉后面的组件，最后渲染出来的应该是个showLoading。 但是react-lite在渲染子组件的时候（递归渲染虚拟dom），会判断当前是否为布尔类型和null，如果是布尔类型或者null，则会被直接过滤掉。
+
+```javascript
+function collectChild(child, children) {
+    if (child != null && typeof child !== 'boolean') {
+        if (!child.vtype) {
+            // convert immutablejs data
+            if (child.toJS) {
+                child = child.toJS()
+                if (_.isArr(child)) {
+                    _.flatEach(child, collectChild, children)
+                } else {
+                    collectChild(child, children)
+                }
+                return
+            }
+            child = '' + child
+        }
+        children[children.length] = child
+    }
+}
+```
 ## setState
 react里面setState后不会立即更新，但在某些场景下也会立即更新，下面这几种情况打印的值你都能回答的上来吗？
-```
+```javascript
 class App extends React.Component {
     state = {
         count: 0;
