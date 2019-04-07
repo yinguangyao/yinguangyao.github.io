@@ -111,10 +111,10 @@ menu_icons:
 # ---------------------------------------------------------------
 
 # Schemes
-scheme: Pisces
-#scheme: Mist
-#scheme: Pisces
-#scheme: Gemini
+# scheme: Pisces
+scheme: Mist
+# scheme: Muse
+# scheme: Gemini
 
 
 # ---------------------------------------------------------------
@@ -151,7 +151,7 @@ links_title: Links
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.gif
 # in site  directory(source/uploads): /uploads/avatar.gif
-avatar: /images/xiong.jpg
+avatar: /images/me.jpg
 
 # Table Of Contents in the Sidebar
 toc:
@@ -202,7 +202,7 @@ sidebar:
 # ---------------------------------------------------------------
 
 # Automatically scroll page to section which is under <!-- more --> mark.
-scroll_to_more: false
+scroll_to_more: true
 
 # Automatically saving scroll position on each post/page in cookies.
 save_scroll: true
@@ -528,7 +528,7 @@ rating:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn get AppID and AppKey.
 leancloud_visitors:
-  enable: true
+  enable: false
   app_id: y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz
   app_key: JECyn6ArPKLf3DBNjH1SdH8H
 
@@ -601,7 +601,7 @@ algolia_search:
 # Local search
 # Dependencies: https://github.com/flashlab/hexo-generator-search
 local_search:
-  enable: true
+  enable: false
   # if auto, trigger search by changing input
   # if manual, trigger search by pressing enter key or search button
   trigger: auto

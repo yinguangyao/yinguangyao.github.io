@@ -1304,7 +1304,7 @@
   display: inline-block;
   margin-right: 5px!important;
   width: 18px;
-  height: 18px;
+  height: 14px;
   background: url('../../images/zhihu.svg') no-repeat center;
 }
 .fa-zhihu:before {
