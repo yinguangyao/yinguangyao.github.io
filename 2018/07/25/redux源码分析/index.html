@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,redux,react,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前几天和小伙伴讨论一个问题，就是在reducer方法里面拿到state后，如果直接对state对象做修改，但是还没有return出来，到这一步的时候会不会已经修改了store里的数据，我当时觉得应该不会，但是实在也想不明白，如果不做深拷贝，那还有其他办法能避免修改原始数据吗？但是redux中又不可能对数据进行深拷贝，这样做的代价太大了，于是带着一点好奇心，研究了一下redux源码。">
+<meta name="keywords" content="前端,redux,react">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redux源码分析">
+<meta property="og:url" content="http://yoursite.com/2018/07/25/redux源码分析/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="前几天和小伙伴讨论一个问题，就是在reducer方法里面拿到state后，如果直接对state对象做修改，但是还没有return出来，到这一步的时候会不会已经修改了store里的数据，我当时觉得应该不会，但是实在也想不明白，如果不做深拷贝，那还有其他办法能避免修改原始数据吗？但是redux中又不可能对数据进行深拷贝，这样做的代价太大了，于是带着一点好奇心，研究了一下redux源码。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/1jibi2tofs7mazu6jfsmxs7s/redux%E5%85%A5%E5%8F%A3.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/an7e9bhcfayz00zh4etg20w1/createStore.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/kum9agu106cscpkcp1wbsarb/combineReducers.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/0jwy1qmx1uqwsnzgjm1qas2f/applyMi.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/tw7co5q0p8dkn1kdyqyi72en/compose.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/y8s7f4h2s6dmzqxb2zpa5kte/dispatch.png">
+<meta property="og:image" content="http://static.zybuluo.com/gyyin/fmtq4qz206dnet1s2h4x4zz1/subscribe.png">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.868Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redux源码分析">
+<meta name="twitter:description" content="前几天和小伙伴讨论一个问题，就是在reducer方法里面拿到state后，如果直接对state对象做修改，但是还没有return出来，到这一步的时候会不会已经修改了store里的数据，我当时觉得应该不会，但是实在也想不明白，如果不做深拷贝，那还有其他办法能避免修改原始数据吗？但是redux中又不可能对数据进行深拷贝，这样做的代价太大了，于是带着一点好奇心，研究了一下redux源码。">
+<meta name="twitter:image" content="http://static.zybuluo.com/gyyin/1jibi2tofs7mazu6jfsmxs7s/redux%E5%85%A5%E5%8F%A3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/25/redux源码分析/">
+
+
+
+
+
+  <title>redux源码分析 | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/25/redux源码分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">redux源码分析</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-25T23:46:14+08:00">
+                2018-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/react/" itemprop="url" rel="index">
+                    <span itemprop="name">react</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/25/redux源码分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/07/25/redux源码分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前几天和小伙伴讨论一个问题，就是在reducer方法里面拿到state后，如果直接对state对象做修改，但是还没有return出来，到这一步的时候会不会已经修改了store里的数据，我当时觉得应该不会，但是实在也想不明白，如果不做深拷贝，那还有其他办法能避免修改原始数据吗？但是redux中又不可能对数据进行深拷贝，这样做的代价太大了，于是带着一点好奇心，研究了一下redux源码。<br><a id="more"></a></p>
+<h2 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h2><p>redux源码还是比想象中的要精炼很多的，除去注释和打印错误信息，核心代码大概在两三百行左右，我们就先从createStore这个入口函数一探究竟。</p>
+<p><img src="http://static.zybuluo.com/gyyin/1jibi2tofs7mazu6jfsmxs7s/redux%E5%85%A5%E5%8F%A3.png" alt="redux入口.png-41.8kB"></p>
+<p>从返回参数来看，createStore函数主要返回了这四个我们常用的函数。<br><img src="http://static.zybuluo.com/gyyin/an7e9bhcfayz00zh4etg20w1/createStore.png" alt="createStore.png-251.1kB"></p>
+<p>进入到create函数里面看，第一个判断应该是当用户没有给初始化的数据，直接将enhancer函数（一般是applyMiddleware）当第二个参数传进来的时候做的一些默认处理，如果enhancer是一个函数，那么就会把reducer和preloadedState传给enhancer，我们知道enhancer一般是一些中间件函数，这里的reducer一般是combineReducers这个函数的返回值，我们再来看看combineReducers和applyMiddleware这两个函数。</p>
+<h2 id="combineReducers"><a href="#combineReducers" class="headerlink" title="combineReducers"></a>combineReducers</h2><p>删除掉多余的注释和打印信息后，完整的combineReducers函数是这样的：<br><img src="http://static.zybuluo.com/gyyin/kum9agu106cscpkcp1wbsarb/combineReducers.png" alt="combineReducers.png-309.2kB"></p>
+<p>参数reducers就是我们最后传给combineReducers的那个对象，一般是我们reducer函数的对象集合。<br>这里代码也很清晰了，将reducer函数以键值对的形式赋给finalReducers对象，并且返回一个combination函数，这个函数可以拿到当前的状态和要执行的action，这两个参数肯定是在createStore里面调用的时候传入的，我们先不用管。<br>这里使用for循环来遍历每一个reducer函数，这也就意味着，我们每次触发一个action，redux都会遍历并执行一遍所有的reducer函数，直到找到匹配的那个action.type（这里我不得不说react-imvc应该是做了一些优化的，它以action.type作为reducer函数名，这样就不需要去遍历查找了，可以减少很多不必要的工作量）。<br>并且将执行后的结果nextStateForKey和前一个状态做比较，最后根据判断是return新值还是老值，这也是为什么在reducer函数里面最后一定要return出来一个新的对象or数组才会刷新store，而不能简单的修改一下当前的state，并将其直接返回，因为这里比较的是引用。</p>
+<h2 id="applyMiddleware"><a href="#applyMiddleware" class="headerlink" title="applyMiddleware"></a>applyMiddleware</h2><p>Middleware这个概念是Redux从其他框架借鉴过来的，本意如下：</p>
+<blockquote>
+<p>middleware是指可以被嵌入在框架接收请求到产生响应过程之中的代码。例如，Express 或者 Koa 的 middleware<br>可以完成添加 CORS headers、记录日志、内容压缩等工作。</p>
+</blockquote>
+<p>而在Redux中：</p>
+<blockquote>
+<p>middleware被用于解决不同的问题，但其中的概念是类似的。它提供的是位于 action 被发起之后，到达 reducer<br>之前的扩展点。 你可以利用 Redux middleware 来进行日志记录、创建崩溃报告、调用异步接口或者路由等等。</p>
+</blockquote>
+<p>看完了combineReducers函数，我们继续分析applyMiddleware函数：</p>
+<p><img src="http://static.zybuluo.com/gyyin/0jwy1qmx1uqwsnzgjm1qas2f/applyMi.png" alt="applyMi.png-172kB"></p>
+<p>applyMiddleware函数就更加简练了一些，我们一般会把redux-thunk、redux-logger这种中间件当做参数传给applyMiddleware。<br>redux的中间件是在action触发后执行的，所以中间件内部必须拿到完整的state、dispatch和action，这里使用compose包裹了中间件方法，最终返回了一个新的dispatch，可以理解为这个dispatch是经过中间件加强后的dispatch。</p>
+<h2 id="compose"><a href="#compose" class="headerlink" title="compose"></a>compose</h2><p><img src="http://static.zybuluo.com/gyyin/tw7co5q0p8dkn1kdyqyi72en/compose.png" alt="compose.png-80.9kB"></p>
+<p>这里是compose的源码，我们可以明显看出来这里是将dispatch再次作为参数放进去的，最后得到一个强化的dispatch，结合redux-logger来理解，大概是传入dispatch后对其加了打印的功能，之后再返回出来。</p>
+<h2 id="dispatch"><a href="#dispatch" class="headerlink" title="dispatch"></a>dispatch</h2><p>再回头来看我们的createStore函数，我们关键来看一下对应的几个函数：<br><img src="http://static.zybuluo.com/gyyin/y8s7f4h2s6dmzqxb2zpa5kte/dispatch.png" alt="dispatch.png-152.4kB"><br>首先是我们的dispatch函数，dispatch函数主要做了两件事，一个是执行reducer函数拿到最新的state，另一个是执行subscribe的事件。<br>dispatch接收了一个action当参数，通过isDispatching来判断是否执行reducer，这也就不可能出现多个dispatch同时执行的情况了，因为这样会干扰store的值。这里看到会把currentState传到reducer里面，更新后得到了新的currentState，之后还执行了一下listener函数，这个函数是从nextListeners里面拿到的。</p>
+<h2 id="subscribe"><a href="#subscribe" class="headerlink" title="subscribe"></a>subscribe</h2><p>这里我们看一下subscribe函数：<br><img src="http://static.zybuluo.com/gyyin/fmtq4qz206dnet1s2h4x4zz1/subscribe.png" alt="subscribe.png-128kB"></p>
+<p>subscribe会传入一个回调函数，这个函数一般是监听redux中状态变化后执行的，nextListeners里面保存着所有需要执行的回调，如果subscribe函数执行两次，那就是卸载当前加载上的listener。<br>这样的话，其实还是有一个问题，如果我们用subscribe监听了ReactDOM.render，这样我们每次发送dispatch，即使最后state没有变化，页面也是会重新render。</p>
+<h2 id="重写"><a href="#重写" class="headerlink" title="重写"></a>重写</h2><p>这里是自己重写的简练版redux：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">/// 这里需要对参数为0或1的情况进行判断</span><br><span class="line">const compose = (...funcs) =&gt; &#123;</span><br><span class="line">    if (!funcs) &#123;</span><br><span class="line">        return args =&gt; args</span><br><span class="line">    &#125;</span><br><span class="line">    if (funcs.length === 1) &#123;</span><br><span class="line">        return funcs[0]</span><br><span class="line">    &#125;</span><br><span class="line">    return funcs.reduce((f1, f2) =&gt; (...args) =&gt; f1(f2(...args)))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const bindActionCreator = (action, dispatch) =&gt; &#123;</span><br><span class="line">    return (...args) =&gt; dispatch(action(...args))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const createStore = (reducer, initState, enhancer) =&gt; &#123;</span><br><span class="line">    if (!enhancer &amp;&amp; typeof initState === &quot;function&quot;) &#123;</span><br><span class="line">        enhancer = initState</span><br><span class="line">        initState = null</span><br><span class="line">    &#125;</span><br><span class="line">    if (enhancer &amp;&amp; typeof enhancer === &quot;function&quot;) &#123;</span><br><span class="line">        return enhancer(createStore)(reducer, initState)</span><br><span class="line">    &#125;</span><br><span class="line">    let store = initState, </span><br><span class="line">        listeners = [],</span><br><span class="line">        isDispatch = false;</span><br><span class="line">    const getState = () =&gt; store</span><br><span class="line">    const dispatch = (action) =&gt; &#123;</span><br><span class="line">        if (isDispatch) return action</span><br><span class="line">        // dispatch必须一个个来</span><br><span class="line">        isDispatch = true</span><br><span class="line">        store = reducer(store, action)</span><br><span class="line">        isDispatch = false</span><br><span class="line">        listeners.forEach(listener =&gt; listener())</span><br><span class="line">        return action</span><br><span class="line">    &#125;</span><br><span class="line">    const subscribe = (listener) =&gt; &#123;</span><br><span class="line">        if (typeof listener === &quot;function&quot;) &#123;</span><br><span class="line">            listeners.push(listener)</span><br><span class="line">        &#125;</span><br><span class="line">        return () =&gt; unsubscribe(listener)</span><br><span class="line">    &#125;</span><br><span class="line">    const unsubscribe = (listener) =&gt; &#123;</span><br><span class="line">        const index = listeners.indexOf(listener)</span><br><span class="line">        listeners.splice(index, 1)</span><br><span class="line">    &#125;</span><br><span class="line">    return &#123;</span><br><span class="line">        getState,</span><br><span class="line">        dispatch,</span><br><span class="line">        subscribe,</span><br><span class="line">        unsubscribe</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const applyMiddleware = (...middlewares) =&gt; &#123;</span><br><span class="line">    return (createStore) =&gt; (reducer, initState, enhancer) =&gt; &#123;</span><br><span class="line">        const store = createStore(reducer, initState, enhancer)</span><br><span class="line">        let chain = middlewares.map(middleware =&gt; middleware(store))</span><br><span class="line">        store.dispatch = compose(...chain)(store.dispatch)</span><br><span class="line">        return &#123;</span><br><span class="line">          ...store</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const combineReducers = reducers =&gt; &#123;</span><br><span class="line">    const finalReducers = &#123;&#125;,</span><br><span class="line">        nativeKeys = Object.keys</span><br><span class="line">    nativeKeys(reducers).forEach(reducerKey =&gt; &#123;</span><br><span class="line">        if(typeof reducers[reducerKey] === &quot;function&quot;) &#123;</span><br><span class="line">            finalReducers[reducerKey] = reducers[reducerKey]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    return (state, action) =&gt; &#123;</span><br><span class="line">        const store = &#123;&#125;</span><br><span class="line">        nativeKeys(finalReducers).forEach(key =&gt; &#123;</span><br><span class="line">            const reducer = finalReducers[key]</span><br><span class="line">            const nextState = reducer(state[key], action)</span><br><span class="line">            store[key] = nextState</span><br><span class="line">        &#125;)</span><br><span class="line">        return store</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>redux源码实现很精简，比想象中的还要简单，react-redux在redux基础中多了Provider和connect两个方法，通过context将store传给Provider包裹的组件，之后会再开一篇文章分析react-redux的源码。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/redux/" rel="tag"># redux</a>
+          
+            <a href="/tags/react/" rel="tag"># react</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/15/管理自己/" rel="next" title="管理自己">
+                <i class="fa fa-chevron-left"></i> 管理自己
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/05/react状态管理/" rel="prev" title="react状态管理">
+                react状态管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#createStore"><span class="nav-number">1.</span> <span class="nav-text">createStore</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#combineReducers"><span class="nav-number">2.</span> <span class="nav-text">combineReducers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#applyMiddleware"><span class="nav-number">3.</span> <span class="nav-text">applyMiddleware</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compose"><span class="nav-number">4.</span> <span class="nav-text">compose</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dispatch"><span class="nav-number">5.</span> <span class="nav-text">dispatch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#subscribe"><span class="nav-number">6.</span> <span class="nav-text">subscribe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重写"><span class="nav-number">7.</span> <span class="nav-text">重写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

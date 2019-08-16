@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,读书笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这里只记录了对自己有用的部分，更详细的内容请看《编写可维护的Javascipt》原书。 编程风格格式化 一行代码长度一般不超过80个字符 JS语句在换行的时候一般需要两个缩进 在语义不相关的JS语句之间空行 避免没有意义的函数/变量命名，如foo、tmp等等 使用大写来定义常量  注释 多行注释使用/ / hack注释">
+<meta name="keywords" content="前端,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《编写可维护的JS》笔记">
+<meta property="og:url" content="http://yoursite.com/2018/07/07/《编写可维护的JS》笔记/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="这里只记录了对自己有用的部分，更详细的内容请看《编写可维护的Javascipt》原书。 编程风格格式化 一行代码长度一般不超过80个字符 JS语句在换行的时候一般需要两个缩进 在语义不相关的JS语句之间空行 避免没有意义的函数/变量命名，如foo、tmp等等 使用大写来定义常量  注释 多行注释使用/ / hack注释">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.871Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《编写可维护的JS》笔记">
+<meta name="twitter:description" content="这里只记录了对自己有用的部分，更详细的内容请看《编写可维护的Javascipt》原书。 编程风格格式化 一行代码长度一般不超过80个字符 JS语句在换行的时候一般需要两个缩进 在语义不相关的JS语句之间空行 避免没有意义的函数/变量命名，如foo、tmp等等 使用大写来定义常量  注释 多行注释使用/ / hack注释">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/07/《编写可维护的JS》笔记/">
+
+
+
+
+
+  <title>《编写可维护的JS》笔记 | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/07/《编写可维护的JS》笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">《编写可维护的JS》笔记</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-07T23:28:19+08:00">
+                2018-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/07/《编写可维护的JS》笔记/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/07/07/《编写可维护的JS》笔记/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这里只记录了对自己有用的部分，更详细的内容请看《编写可维护的Javascipt》原书。</p>
+<h2 id="编程风格"><a href="#编程风格" class="headerlink" title="编程风格"></a>编程风格</h2><h3 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h3><ol>
+<li>一行代码长度一般不超过80个字符</li>
+<li>JS语句在换行的时候一般需要两个缩进</li>
+<li>在语义不相关的JS语句之间空行</li>
+<li>避免没有意义的函数/变量命名，如foo、tmp等等</li>
+<li>使用大写来定义常量</li>
+</ol>
+<h3 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h3><ol>
+<li>多行注释使用/<em> </em>/</li>
+<li><p>hack注释</p>
+<a id="more"></a>
+<h3 id="语句和表达式"><a href="#语句和表达式" class="headerlink" title="语句和表达式"></a>语句和表达式</h3></li>
+<li><p>语句最好不要不带花括号</p>
+</li>
+<li>严格模式下使用with语句会报错</li>
+<li>尽量避免在循环中使用continue</li>
+<li>for in循环的时候最好使用hasOwnProperty判断，除非你想查找原型链</li>
+<li>严格模式（use strict;）最好不要用在全局中，如果想在多个函数使用，可以放到立即执行函数中</li>
+<li>如果布尔值和数字比较，会把布尔值转换为数字，如果一个值是对象，那会调用对象的valueOf方法，如果没有valueOf，那就调用toString方法，得到原始类型值后再比较，通常不建议使用==和!=，推荐===和!==</li>
+<li>避免使用Function和eval，尽管eval可以用在某些JSON操作中，Function则可以用在lodash/underscore的template中</li>
+<li>避免使用原始包装类型，如new String</li>
+</ol>
+<h2 id="编程实践"><a href="#编程实践" class="headerlink" title="编程实践"></a>编程实践</h2><h3 id="UI层的松耦合"><a href="#UI层的松耦合" class="headerlink" title="UI层的松耦合"></a>UI层的松耦合</h3><ol>
+<li>避免在JS中写HTML，可以考虑使用客户端/服务端模板来代替</li>
+</ol>
+<h3 id="避免使用全局变量"><a href="#避免使用全局变量" class="headerlink" title="避免使用全局变量"></a>避免使用全局变量</h3><ol>
+<li>尽量不要去创建全局变量，函数尽量不要依赖全局变量，这样会让你的测试更容易测试</li>
+<li>尽量使用单变量（对象），将需要定义的全局变量都放到它的属性下面<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建命名空间</span></span><br><span class="line"><span class="keyword">var</span> yourGlobal = &#123;</span><br><span class="line">    namespace: <span class="function"><span class="keyword">function</span>(<span class="params">ns</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> paths = ns &amp;&amp; ns.split(<span class="string">"."</span>) || [],</span><br><span class="line">            self = <span class="keyword">this</span></span><br><span class="line">        paths.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">result, currentAttr</span>) </span>&#123;</span><br><span class="line">            self[result] = self[result] || &#123;&#125;</span><br><span class="line">            <span class="keyword">return</span> self[result][currentAttr] = self[result][currentAttr] || &#123;&#125;</span><br><span class="line">        &#125;)  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// yourGlobal.a.b就是一个命名空间</span></span><br><span class="line">yourGlobal.namespace(<span class="string">"a.b"</span>)</span><br><span class="line">yourGlobal.a.b.c = <span class="number">0</span></span><br><span class="line"><span class="built_in">console</span>.log(yourGlobal.a.b)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h3><ol>
+<li>事件触发的时候隔离应用逻辑，将应用逻辑从事件处理程序中抽离出来，便于测试</li>
+<li>不要分发事件对象event，应用逻辑不应该依赖于event对象，如果需要event中的某属性，那么直接传入这个属性，不应该传入event对象，这样也便于测试</li>
+</ol>
+<h3 id="避免空比较"><a href="#避免空比较" class="headerlink" title="避免空比较"></a>避免空比较</h3><ol>
+<li>避免空比较，多使用typeof来判断类型，除非可以确定期望值的类型</li>
+<li>检查引用值类型的时候使用instanceof方法</li>
+</ol>
+<h3 id="将配置数据从代码中抽离"><a href="#将配置数据从代码中抽离" class="headerlink" title="将配置数据从代码中抽离"></a>将配置数据从代码中抽离</h3><h3 id="抛出自定义错误"><a href="#抛出自定义错误" class="headerlink" title="抛出自定义错误"></a>抛出自定义错误</h3><ol>
+<li>针对会引发错误的场景，将错误抛出（throw），有利于调试</li>
+</ol>
+<h3 id="不是你的对象不要动"><a href="#不是你的对象不要动" class="headerlink" title="不是你的对象不要动"></a>不是你的对象不要动</h3><ol>
+<li>不是你创建的对象，那么就不要修改，比如原生对象、DOM对象、BOM对象和类库的对象</li>
+<li>对待已存在的对象应该不覆盖方法、不新增方法、不删除方法</li>
+<li>如果不得不修改，可以继承或复制这个对象得到一个自己的对象，再对自己的这个对象进行操作</li>
+<li>使用<a href="http://www.cnblogs.com/skywang/articles/1375447.html" target="_blank" rel="noopener">门面模式</a>，门面模式的用意是为子系统提供一个集中化和简化的沟通管道，而不能向子系统加入新的行为</li>
+<li>禁止扩展对象Object.preventExtension()，禁止为对象增加属性，但是可以删除和修改已有的属性，Object.isExtensible函数可以检查是否不可扩展</li>
+<li>密封对象Object.seal()，禁止删除和增加属性，但是可以修改已有的属性，Object.isSealed函数可以检查是否密封</li>
+<li>冻结对象Object.freeze()，禁止删除、增加和修改对象</li>
+</ol>
+<h3 id="浏览器嗅探"><a href="#浏览器嗅探" class="headerlink" title="浏览器嗅探"></a>浏览器嗅探</h3><ol>
+<li>不能根据一个特性去推断另一个特性，比如支持getElementsByTagName就一定支持getElementById</li>
+<li>避免使用浏览器推断和特性推断，尽量使用特性检测</li>
+</ol>
+<h3 id="自动化"><a href="#自动化" class="headerlink" title="自动化"></a>自动化</h3><h3 id="文件和目录结构"><a href="#文件和目录结构" class="headerlink" title="文件和目录结构"></a>文件和目录结构</h3><ol>
+<li>保持一个文件只有一个对象（组件？类？）</li>
+<li>相关的文件用目录分组</li>
+<li>保持第三方代码独立（npm了解一下？）</li>
+<li>目录结构（build、src、test）<h3 id="校验"><a href="#校验" class="headerlink" title="校验"></a>校验</h3>这几章使用的工具比较过时了，建议直接学习webpack<h3 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h3></li>
+<li>现代浏览器都支持http压缩，并且会发送一个http头作为请求的一部分来指名压缩类型的，比如：Accept-Encoding: gzip, deflate，服务器在http请求头中发现这些信息，会明白浏览器是支持通过gzip或者deflate对压缩后的文件执行解压缩的，会返回Content-Encoding: gzip来指名压缩的类型</li>
+<li>apache2和nginx内置了gzip作为http压缩<h3 id="文档化"><a href="#文档化" class="headerlink" title="文档化"></a>文档化</h3><h3 id="自动化测试"><a href="#自动化测试" class="headerlink" title="自动化测试"></a>自动化测试</h3>书上的内容也比较老的，建议使用jest和mocha<h3 id="组装到一起"><a href="#组装到一起" class="headerlink" title="组装到一起"></a>组装到一起</h3></li>
+<li>编制打包计划</li>
+<li>开发版本的构建</li>
+<li>集成版本的构建</li>
+<li>发布版本的构建</li>
+<li>使用CI系统</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/30/实现一个bind函数/" rel="next" title="实现一个bind函数">
+                <i class="fa fa-chevron-left"></i> 实现一个bind函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/15/管理自己/" rel="prev" title="管理自己">
+                管理自己 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编程风格"><span class="nav-number">1.</span> <span class="nav-text">编程风格</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#格式化"><span class="nav-number">1.1.</span> <span class="nav-text">格式化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注释"><span class="nav-number">1.2.</span> <span class="nav-text">注释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语句和表达式"><span class="nav-number">1.3.</span> <span class="nav-text">语句和表达式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编程实践"><span class="nav-number">2.</span> <span class="nav-text">编程实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UI层的松耦合"><span class="nav-number">2.1.</span> <span class="nav-text">UI层的松耦合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免使用全局变量"><span class="nav-number">2.2.</span> <span class="nav-text">避免使用全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事件处理"><span class="nav-number">2.3.</span> <span class="nav-text">事件处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免空比较"><span class="nav-number">2.4.</span> <span class="nav-text">避免空比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将配置数据从代码中抽离"><span class="nav-number">2.5.</span> <span class="nav-text">将配置数据从代码中抽离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抛出自定义错误"><span class="nav-number">2.6.</span> <span class="nav-text">抛出自定义错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不是你的对象不要动"><span class="nav-number">2.7.</span> <span class="nav-text">不是你的对象不要动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器嗅探"><span class="nav-number">2.8.</span> <span class="nav-text">浏览器嗅探</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动化"><span class="nav-number">2.9.</span> <span class="nav-text">自动化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件和目录结构"><span class="nav-number">2.10.</span> <span class="nav-text">文件和目录结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#校验"><span class="nav-number">2.11.</span> <span class="nav-text">校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压缩"><span class="nav-number">2.12.</span> <span class="nav-text">压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文档化"><span class="nav-number">2.13.</span> <span class="nav-text">文档化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动化测试"><span class="nav-number">2.14.</span> <span class="nav-text">自动化测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组装到一起"><span class="nav-number">2.15.</span> <span class="nav-text">组装到一起</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

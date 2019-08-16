@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,函数式编程,javascript,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="js函数柯里化&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;最近一阵子利用上班的空暇时间看了看函数式编程相关的东西，有什么错误的地方希望能够指出来。 概念&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;用我自己的话来总结一下，函数柯里化的意思就是你可以一次传很多参数给curry函数，也可以分多次传递，curry函数每次都会返回一个函数去处理剩下的参数，一直到返回最后的结果。 实例&amp;n">
+<meta name="keywords" content="前端,函数式编程,javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS函数柯里化">
+<meta property="og:url" content="http://yoursite.com/2018/05/09/JS函数柯里化/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="js函数柯里化&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;最近一阵子利用上班的空暇时间看了看函数式编程相关的东西，有什么错误的地方希望能够指出来。 概念&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;用我自己的话来总结一下，函数柯里化的意思就是你可以一次传很多参数给curry函数，也可以分多次传递，curry函数每次都会返回一个函数去处理剩下的参数，一直到返回最后的结果。 实例&amp;n">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.867Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS函数柯里化">
+<meta name="twitter:description" content="js函数柯里化&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;最近一阵子利用上班的空暇时间看了看函数式编程相关的东西，有什么错误的地方希望能够指出来。 概念&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;用我自己的话来总结一下，函数柯里化的意思就是你可以一次传很多参数给curry函数，也可以分多次传递，curry函数每次都会返回一个函数去处理剩下的参数，一直到返回最后的结果。 实例&amp;n">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/09/JS函数柯里化/">
+
+
+
+
+
+  <title>JS函数柯里化 | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/09/JS函数柯里化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">JS函数柯里化</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-09T18:13:05+08:00">
+                2018-05-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/函数式编程/" itemprop="url" rel="index">
+                    <span itemprop="name">函数式编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/09/JS函数柯里化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/05/09/JS函数柯里化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="js函数柯里化"><a href="#js函数柯里化" class="headerlink" title="js函数柯里化"></a>js函数柯里化</h2><p>&nbsp; &nbsp; &nbsp; &nbsp;最近一阵子利用上班的空暇时间看了看函数式编程相关的东西，有什么错误的地方希望能够指出来。</p>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>&nbsp; &nbsp; &nbsp; &nbsp;用我自己的话来总结一下，函数柯里化的意思就是你可以一次传很多参数给curry函数，也可以分多次传递，curry函数每次都会返回一个函数去处理剩下的参数，一直到返回最后的结果。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>&nbsp; &nbsp; &nbsp; &nbsp; 这里还是举几个例子来说明一下：</p>
+<h3 id="柯里化求和函数"><a href="#柯里化求和函数" class="headerlink" title="柯里化求和函数"></a>柯里化求和函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 普通方式</span><br><span class="line">var add1 = function(a, b, c)&#123;</span><br><span class="line">    return a + b + c;</span><br><span class="line">&#125;</span><br><span class="line">// 柯里化</span><br><span class="line">var add2 = function(a) &#123;</span><br><span class="line">    return function(b) &#123;</span><br><span class="line">        return function(c) &#123;</span><br><span class="line">            return a + b + c;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 这里每次传入参数都会返回一个新的函数，这样一直执行到最后一次返回a+b+c的值。<br>&nbsp; &nbsp; &nbsp; &nbsp; 但是这种实现还是有问题的，这里只有三个参数，如果哪天产品经理告诉我们需要改成100次？我们就重新写100次？这很明显不符合开闭原则，所以我们需要对函数进行一次修改。<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var add = function() &#123;</span><br><span class="line">    var _args = [];</span><br><span class="line">    return function() &#123;</span><br><span class="line">        if(arguments.length === 0) &#123;</span><br><span class="line">            return _args.reduce(function(a, b) &#123;</span><br><span class="line">                return a + b;</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">        [].push.apply(_args, arguments);</span><br><span class="line">        return arguments.callee;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var sum = add();</span><br><span class="line">sum(100, 200)(300);</span><br><span class="line">sum(400);</span><br><span class="line">sum(); // 1000</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 我们通过判断下一次是否传进来参数来决定函数是否运行，如果继续传进了参数，那我们继续把参数都保存起来，等运行的时候全部一次性运行，这样我们就初步完成了一个柯里化的函数。</p>
+<h3 id="通用柯里化函数"><a href="#通用柯里化函数" class="headerlink" title="通用柯里化函数"></a>通用柯里化函数</h3><p>&nbsp; &nbsp; &nbsp; &nbsp; 这里只是一个求和的函数，如果换成求乘积呢？我们是不是又需要重新写一遍？仔细观察一下我们的add函数，如果我们将if里面的代码换成一个函数执行代码，是不是就可以变成一个通用函数了？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var curry = function(fn) &#123;</span><br><span class="line">    var _args = [];</span><br><span class="line">    return function() &#123;</span><br><span class="line">        if(arguments.length === 0) &#123;</span><br><span class="line">            return fn.apply(fn, _args);</span><br><span class="line">        &#125;</span><br><span class="line">        [].push.apply(_args, arguments);</span><br><span class="line">        return arguments.callee;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var multi = function() &#123;</span><br><span class="line">    return [].reduce.call(arguments, function(a, b) &#123;</span><br><span class="line">        return a + b;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">var add = curry(multi);</span><br><span class="line">add(100, 200, 300)(400);</span><br><span class="line">add(1000);</span><br><span class="line">add(); // 2000</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 在之前的方法上面，我们进行了扩展，这样我们就已经实现了一个比较通用的柯里化函数了。<br>&nbsp; &nbsp; &nbsp; &nbsp;  也许你想问，我不想每次都使用那个丑陋的括号结尾怎么办？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var curry = function(fn) &#123;</span><br><span class="line">	var len = fn.length,</span><br><span class="line">		args = [];</span><br><span class="line">	return function() &#123;</span><br><span class="line">		Array.prototype.push.apply(args, arguments)</span><br><span class="line">		var argsLen = args.length;</span><br><span class="line">		if(argsLen &lt; len) &#123;</span><br><span class="line">			return arguments.callee;</span><br><span class="line">		&#125;</span><br><span class="line">		return fn.apply(fn, args);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">var add = function(a, b, c) &#123;</span><br><span class="line">	return a + b + c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var adder = curry(add)</span><br><span class="line">adder(1)(2)(3)</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 这里根据函数fn的参数数量进行判断，直到传入的数量等于fn函数需要的参数数量才会返回fn函数的最终运行结果，和上面那种方法原理其实是一样的，但是这两种方式都太依赖参数数量了。<br>&nbsp; &nbsp; &nbsp; &nbsp; 我在简书还看到别人的另一种递归实现方法，其实实现思路和我的差不多吧。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 简单实现，参数只能从右到左传递</span><br><span class="line">function createCurry(func, args) &#123;</span><br><span class="line"></span><br><span class="line">    var arity = func.length;</span><br><span class="line">    var args = args || [];</span><br><span class="line"></span><br><span class="line">    return function() &#123;</span><br><span class="line">        var _args = [].slice.call(arguments);</span><br><span class="line">        [].push.apply(_args, args);</span><br><span class="line"></span><br><span class="line">        // 如果参数个数小于最初的func.length，则递归调用，继续收集参数</span><br><span class="line">        if (_args.length &lt; arity) &#123;</span><br><span class="line">            return createCurry.call(this, func, _args);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 参数收集完毕，则执行func</span><br><span class="line">        return func.apply(this, _args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 这里是对参数个数进行了计算，如果需要无限参数怎么办？比如下面这种场景。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add(1)(2)(3)(2);</span><br><span class="line">add(1, 2, 3, 4, 5);</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;这里主要有一个知识点，那就是函数的隐式转换，涉及到toString和valueOf两个方法，如果直接对函数进行计算，那么会先把函数转换为字符串，之后再参与到计算中，利用这两个方法我们可以对函数进行修改。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var num = function() &#123;</span><br><span class="line">&#125;</span><br><span class="line">num.toString = num.valueOf = function() &#123;</span><br><span class="line">	return 10;</span><br><span class="line">&#125;</span><br><span class="line">var anonymousNum = (function() &#123; // 10</span><br><span class="line">	return num;</span><br><span class="line">&#125;())</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 经过修改，我们的函数最终版是这样的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">var curry = function(fn) &#123;</span><br><span class="line">	var func = function() &#123;</span><br><span class="line">		var _args = [].slice.call(arguments, 0);</span><br><span class="line">		var func1 = function() &#123;</span><br><span class="line">			[].push.apply(_args, arguments)</span><br><span class="line">			return func1;</span><br><span class="line">		&#125;</span><br><span class="line">		func1.toString = func1.valueOf = function() &#123;</span><br><span class="line">			return fn.apply(fn, _args);</span><br><span class="line">		&#125;</span><br><span class="line">		return func1;</span><br><span class="line">	&#125;</span><br><span class="line">	return func;</span><br><span class="line">&#125;</span><br><span class="line">var add = function() &#123;</span><br><span class="line">	return [].reduce.call(arguments, function(a, b) &#123;</span><br><span class="line">		return a + b;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var adder = curry(add)</span><br><span class="line">adder(1)(2)(3)</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;  那么我们说了那么多，柯里化究竟有什么用呢？</p>
+<h4 id="预加载"><a href="#预加载" class="headerlink" title="预加载"></a>预加载</h4><p>&nbsp; &nbsp; &nbsp; &nbsp; 在很多场景下，我们需要的函数参数很可能有一部分一样，这个时候再重复写就比较浪费了，我们提前加载好一部分参数，再传入剩下的参数，这里主要是利用了闭包的特性，通过闭包可以保持着原有的作用域。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var match = curry(function(what, str) &#123;</span><br><span class="line">  return str.match(what);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">match(/\s+/g, &quot;hello world&quot;);</span><br><span class="line">// [ &apos; &apos; ]</span><br><span class="line"></span><br><span class="line">match(/\s+/g)(&quot;hello world&quot;);</span><br><span class="line">// [ &apos; &apos; ]</span><br><span class="line"></span><br><span class="line">var hasSpaces = match(/\s+/g);</span><br><span class="line">// function(x) &#123; return x.match(/\s+/g) &#125;</span><br><span class="line"></span><br><span class="line">hasSpaces(&quot;hello world&quot;);</span><br><span class="line">// [ &apos; &apos; ]</span><br><span class="line"></span><br><span class="line">hasSpaces(&quot;spaceless&quot;);</span><br><span class="line">// null</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 上面例子中，使用hasSpaces函数来保存正则表达式规则，这样可以有效的实现参数的复用。</p>
+<h4 id="动态创建函数"><a href="#动态创建函数" class="headerlink" title="动态创建函数"></a>动态创建函数</h4><p>&nbsp; &nbsp; &nbsp; &nbsp; 这个其实也是一种惰性函数的思想，我们可以提前执行判断条件，通过闭包将其保存在有效的作用域中，来看一种我们平时写代码常见的场景。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var addEvent = function(el, type, fn, capture) &#123;</span><br><span class="line">    if (window.addEventListener) &#123;</span><br><span class="line">        el.addEventListener(type, function(e) &#123;</span><br><span class="line">            fn.call(el, e);</span><br><span class="line">        &#125;, capture);</span><br><span class="line">    &#125; else if (window.attachEvent) &#123;</span><br><span class="line">        el.attachEvent(&quot;on&quot; + type, function(e) &#123;</span><br><span class="line">            fn.call(el, e);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 在这个例子中，我们每次调用addEvent的时候都会重新进行if语句进行判断，但是实际上浏览器的条件不可能会变化，你判断一次和判断N次结果都是一样的，所以这个可以将判断条件提前加载。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var addEventHandler = function()&#123;</span><br><span class="line">    if (window.addEventListener) &#123;</span><br><span class="line">        return function(el, sType, fn, capture) &#123;</span><br><span class="line">            el.addEventListener(sType, function(e) &#123;</span><br><span class="line">                fn.call(el, e);</span><br><span class="line">            &#125;, (capture));</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125; else if (window.attachEvent) &#123;</span><br><span class="line">        return function(el, sType, fn, capture) &#123;</span><br><span class="line">            el.attachEvent(&quot;on&quot; + sType, function(e) &#123;</span><br><span class="line">                fn.call(el, e);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var addEvent = addEventHandler();</span><br><span class="line">addEvent(document.body, &quot;click&quot;, function() &#123;&#125;, false);</span><br><span class="line">addEvent(document.getElementById(&quot;test&quot;), &quot;click&quot;, function() &#123;&#125;, false);</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 但是这样做还是有一种缺点，因为我们无法判断程序中是否使用了这个方法，但是依然不得不在文件顶部定义一下addEvent，这样其实浪费了资源，这里有一种更好的解决方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var addEvent = function(el, sType, fn, capture)&#123;</span><br><span class="line">    if (window.addEventListener) &#123;</span><br><span class="line">        addEvent =  function(el, sType, fn, capture) &#123;</span><br><span class="line">            el.addEventListener(sType, function(e) &#123;</span><br><span class="line">                fn.call(el, e);</span><br><span class="line">            &#125;, (capture));</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125; else if (window.attachEvent) &#123;</span><br><span class="line">        addEvent = function(el, sType, fn, capture) &#123;</span><br><span class="line">            el.attachEvent(&quot;on&quot; + sType, function(e) &#123;</span><br><span class="line">                fn.call(el, e);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 在addEvent函数里面对其重新赋值，这样既解决了每次运行都要判断的问题，又解决了必须在作用域顶部执行一次造成浪费的问题。</p>
+<h4 id="React"><a href="#React" class="headerlink" title="React"></a>React</h4><p>&nbsp; &nbsp; &nbsp; &nbsp; 在回家的路上我一直在想函数柯里化是不是可以扩展到更多场景，我想把函数换成react组件试试？我想到了高阶组件和redux的connect，这两个确实是将柯里化思想用到react里面的体现。我们想一想，如果把上面例子里面的函数换成组件，参数换成高阶函数呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">    var curry = function(fn) &#123;</span><br><span class="line">	var func = function() &#123;</span><br><span class="line">		var _args = [].slice.call(arguments, 0);</span><br><span class="line">		var func1 = function() &#123;</span><br><span class="line">			[].push.apply(_args, arguments)</span><br><span class="line">			return func1;</span><br><span class="line">		&#125;</span><br><span class="line">		func1.toString = func1.valueOf = function() &#123;</span><br><span class="line">			return fn.apply(fn, _args);</span><br><span class="line">		&#125;</span><br><span class="line">		return func1;</span><br><span class="line">	&#125;</span><br><span class="line">	return func;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var hoc = function(WrappedComponent) &#123;</span><br><span class="line">	return function() &#123;</span><br><span class="line">		var len = arguments.length;</span><br><span class="line">		var NewComponent = WrappedComponent;</span><br><span class="line">		for (var i = 0; i &lt; len; i++) &#123;</span><br><span class="line">			NewComponent = arguments[i](NewComponent)</span><br><span class="line">		&#125;</span><br><span class="line">		return NewComponent;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">var MyComponent = hoc(PageList);</span><br><span class="line">curry(MyComponent)(addStyle)(addLoading)</span><br></pre></td></tr></table></figure></p>
+<p>这个例子是对原来的PageList组件进行了扩展，给PageList加了样式和loading的功能，如果想加其他功能，可以继续在上面扩展（注意addStyle和addLoading都是高阶组件），但是写法真的很糟糕，一点都不coooooool，我们可以使用compose方法，underscore和loadsh这些库中已经提供了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var enhance = compose(addLoading, addStyle);</span><br><span class="line">enhance(MyComponent)</span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>&nbsp; &nbsp; &nbsp; &nbsp; 其实关于柯里化的运用核心还是对函数闭包的灵活运用，深刻理解闭包和作用域后就可以写出很多灵活巧妙的方法。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/函数式编程/" rel="tag"># 函数式编程</a>
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/24/60行代码实现模板引擎/" rel="next" title="60行代码实现模板引擎">
+                <i class="fa fa-chevron-left"></i> 60行代码实现模板引擎
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/30/实现一个bind函数/" rel="prev" title="实现一个bind函数">
+                实现一个bind函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#js函数柯里化"><span class="nav-number">1.</span> <span class="nav-text">js函数柯里化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">1.2.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#柯里化求和函数"><span class="nav-number">1.3.</span> <span class="nav-text">柯里化求和函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通用柯里化函数"><span class="nav-number">1.4.</span> <span class="nav-text">通用柯里化函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#预加载"><span class="nav-number">1.4.1.</span> <span class="nav-text">预加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态创建函数"><span class="nav-number">1.4.2.</span> <span class="nav-text">动态创建函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#React"><span class="nav-number">1.4.3.</span> <span class="nav-text">React</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="工作,周报,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这周的主要任务都是在做IBU酒店列表页，因为大家都是第一次用Mobx，所以我一直在探索Mobx的最佳实践，这里是自己总结的一些经验。 更响应式我最喜欢mobx的地方就是和vue一样的数据监听，框架底层通过Object.defineProperty或Proxy来劫持数据，对组件可以进行更细粒度的渲染。在react中反而把更新组件的操作（setState）交给了使用者，由于setState的”异步”特">
+<meta name="keywords" content="工作,周报">
+<meta property="og:type" content="article">
+<meta property="og:title" content="周报（2018-12-14）">
+<meta property="og:url" content="http://yoursite.com/2018/12/15/周报（2018-12-14）/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="这周的主要任务都是在做IBU酒店列表页，因为大家都是第一次用Mobx，所以我一直在探索Mobx的最佳实践，这里是自己总结的一些经验。 更响应式我最喜欢mobx的地方就是和vue一样的数据监听，框架底层通过Object.defineProperty或Proxy来劫持数据，对组件可以进行更细粒度的渲染。在react中反而把更新组件的操作（setState）交给了使用者，由于setState的”异步”特">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://img.alicdn.com/tfs/TB1wm67mjihSKJjy0FiXXcuiFXa-601-435.png">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="周报（2018-12-14）">
+<meta name="twitter:description" content="这周的主要任务都是在做IBU酒店列表页，因为大家都是第一次用Mobx，所以我一直在探索Mobx的最佳实践，这里是自己总结的一些经验。 更响应式我最喜欢mobx的地方就是和vue一样的数据监听，框架底层通过Object.defineProperty或Proxy来劫持数据，对组件可以进行更细粒度的渲染。在react中反而把更新组件的操作（setState）交给了使用者，由于setState的”异步”特">
+<meta name="twitter:image" content="https://img.alicdn.com/tfs/TB1wm67mjihSKJjy0FiXXcuiFXa-601-435.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/15/周报（2018-12-14）/">
+
+
+
+
+
+  <title>周报（2018-12-14） | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/15/周报（2018-12-14）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">周报（2018-12-14）</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-15T17:24:16+08:00">
+                2018-12-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/周报/" itemprop="url" rel="index">
+                    <span itemprop="name">周报</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/12/15/周报（2018-12-14）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/12/15/周报（2018-12-14）/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这周的主要任务都是在做IBU酒店列表页，因为大家都是第一次用Mobx，所以我一直在探索Mobx的最佳实践，这里是自己总结的一些经验。</p>
+<h2 id="更响应式"><a href="#更响应式" class="headerlink" title="更响应式"></a>更响应式</h2><p>我最喜欢mobx的地方就是和vue一样的数据监听，框架底层通过Object.defineProperty或Proxy来劫持数据，对组件可以进行更细粒度的渲染。在react中反而把更新组件的操作（setState）交给了使用者，由于setState的”异步”特性导致了没法立刻拿到更新后的state。<br><a id="more"></a></p>
+<h3 id="computed"><a href="#computed" class="headerlink" title="computed"></a>computed</h3><p>想像一下，在redux中，如果一个值A是由另外几个值B、C、D计算出来的，在store中该怎么实现？<br>如果要实现这么一个功能，最麻烦的做法是在所有B、C、D变化的地方重新计算得出A，最后存入store。<br>当然我也可以在组件渲染A的地方根据B、C、D计算出A，但是这样会把逻辑和组件耦合到一起，如果我需要在其他地方用到A怎么办？<br>我甚至还可以在所有connect的地方计算A，最后传入组件。但由于redux监听的是整个store的变化，所以无法准确的监听到B、C、D变化后才重新计算A。<br>但是mobx中提供了computed来解决这个问题。正如mobx官方介绍的一样，computed是基于现有状态或计算值衍生出的值，如下面todoList的例子，一旦已完成事项数量改变，那么completedCount会自动更新。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class TodoStore &#123;</span><br><span class="line">    @observable todos = []</span><br><span class="line">    @computed get completedCount() &#123;</span><br><span class="line">		return (this.todos.filter(todo =&gt; todo.isCompleted) || []).length</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="reaction"><a href="#reaction" class="headerlink" title="reaction"></a>reaction</h3><p>reaction则是和autorun功能类似，但是autorun会立即执行一次，而reaction不会，使用reaction可以在监听到指定数据变化的时候执行一些操作，有利于和副作用代码解耦。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 当todos改变的时候将其存入缓存</span><br><span class="line">reaction(</span><br><span class="line">    () =&gt; toJS(this.todos),</span><br><span class="line">    (todos) =&gt;  localStorage.setItem(&apos;mobx-react-todomvc-todos&apos;, JSON.stringify(&#123; todos &#125;))</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<h2 id="拆分store"><a href="#拆分store" class="headerlink" title="拆分store"></a>拆分store</h2><p>mobx中的store的创建偏向于面向对象的形式，mobx官方给出的例子todomvc中的store更接近于mvc中的model。<br>但是这样也会带来一个问题，业务逻辑我们应该放到哪里？如果也放到store里面很容易造成不同store之间数据的耦合，因为业务代码必然会耦合不同的数据。<br>我参考了dobjs后，推荐将store拆分为action和dataModel两种。<br>action和dataModel一起组合成了页面的总store，dataModel只存放UI数据以及只涉及自身数据变化的action操作（在mobx严格模式中，修改数据一定要用action或flow）。<br>action store则是负责存放一些需要使用来自不同store数据的action操作。<br>我个人理解，dataModel更像MVC中的model，action store是controller，react components则是view，三者构成了mvc的结构。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">- stores</span><br><span class="line">    - actions</span><br><span class="line">        - hotelListAction.js</span><br><span class="line">    - dataModel</span><br><span class="line">        - globalStatus.js</span><br><span class="line">        - hotelList.js</span><br><span class="line">    - index.js</span><br><span class="line">// globalStatus</span><br><span class="line">class GlobalStatus &#123;</span><br><span class="line">    @observable isShowLoading = false;</span><br><span class="line">    @action showLoading = () =&gt; &#123;</span><br><span class="line">        this.isShowLoading = true</span><br><span class="line">    &#125;</span><br><span class="line">    @action hideLoading = () =&gt; &#123;</span><br><span class="line">        this.isShowLoading = false</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// hotelList</span><br><span class="line">class HotelList &#123;</span><br><span class="line">    @observable hotels = []</span><br><span class="line">    @action addHotels = (hotels) =&gt; &#123;</span><br><span class="line">        this.hotels = [...toJS(this.hotels), ...hotels];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// hotelListAction</span><br><span class="line">class HotelListAction &#123;</span><br><span class="line">    fetchHotelList = flow(function *() &#123;</span><br><span class="line">        const &#123;</span><br><span class="line">            globalStatus,</span><br><span class="line">            hotelList</span><br><span class="line">        &#125; = this.rootStore</span><br><span class="line">        globalStatus.showLoading();</span><br><span class="line">        try &#123;</span><br><span class="line">            const res = yield fetch(&apos;/hoteList&apos;, params);</span><br><span class="line">            hotelList.addHotels(res.hotels);</span><br><span class="line">        &#125; catch (err) &#123;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            globalStatus.hideLoading();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).bind(this)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img.alicdn.com/tfs/TB1wm67mjihSKJjy0FiXXcuiFXa-601-435.png" alt="store结构"></p>
+<h2 id="细粒度的渲染"><a href="#细粒度的渲染" class="headerlink" title="细粒度的渲染"></a>细粒度的渲染</h2><p>observer可以给组件增加订阅功能，一旦收到数据变化的通知就会将组件重新渲染，从而做到更细粒度的更新，这是redux和react很难做到的，因为react中组件重新渲染基本是依赖于setState和接收到新的props，子组件的渲染几乎一定会伴随着父组件的渲染。<br>也许很多人没有注意到，mobx-react中还提供了一个Observer组件，这个组件接收一个render方法或者render props。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const App = () =&gt; &lt;h1&gt;hello, world&lt;/h1&gt;;</span><br><span class="line">&lt;Observer&gt;&#123;() =&gt; &lt;App /&gt;&#125;&lt;/Observer&gt;</span><br><span class="line">&lt;Observer render=&#123;() =&gt; &lt;App /&gt;&#125; /&gt;</span><br></pre></td></tr></table></figure></p>
+<p>也许你要问这个和observer有什么区别？还写的更加复杂了，下面这个例子对比起来会比较明显。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import &#123; observer, Observer, observable &#125; from &apos;mobx-react&apos;</span><br><span class="line">const App = observer(</span><br><span class="line">    (props) =&gt; &lt;h1&gt;hello, &#123;props.name&#125;&lt;/h1&gt;</span><br><span class="line">)</span><br><span class="line">const Header = (props) =&gt; &lt;h1&gt;this is header&lt;/h1&gt;</span><br><span class="line">const Footer = (props) =&gt; &lt;h1&gt;this is footer&lt;/h1&gt;</span><br><span class="line">const Container = observer(</span><br><span class="line">    (props) =&gt; &#123;</span><br><span class="line">        return (</span><br><span class="line">            &lt;&gt;</span><br><span class="line">                &lt;Header /&gt;</span><br><span class="line">                &lt;App name=&#123;props.person.name&#125; /&gt;</span><br><span class="line">                &lt;Footer /&gt;</span><br><span class="line">            &lt;/&gt;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">const person = observable(&#123;name: &quot;gyyin&quot;&#125;);</span><br><span class="line">render(&lt;Container person=&#123;person&#125; /&gt;, document.getElementById(&quot;app&quot;));</span><br><span class="line">person.name = &quot;world&quot;;</span><br></pre></td></tr></table></figure></p>
+<p>上面这个代码，Container组件监听到person.name改变的时候会重新渲染，这样就导致了原本不需要重新渲染的Header和Footer也跟着渲染了，如果使用Observer就可以做到更细粒度的渲染。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const App = (props) =&gt; &lt;h1&gt;hello, &#123;props.name&#125;&lt;/h1&gt;</span><br><span class="line">const Header = (props) =&gt; &lt;h1&gt;this is header&lt;/h1&gt;</span><br><span class="line">const Footer = (props) =&gt; &lt;h1&gt;this is footer&lt;/h1&gt;</span><br><span class="line">const Container = (props) =&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;&gt;</span><br><span class="line">            &lt;Header /&gt;</span><br><span class="line">            &lt;Observer render=&#123;</span><br><span class="line">                () =&gt; &lt;App name=&#123;props.person.name&#125; /&gt;</span><br><span class="line">            &#125;&gt;</span><br><span class="line">            &lt;Footer /&gt;</span><br><span class="line">        &lt;/&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line">const person = observable(&#123;name: &quot;gyyin&quot;&#125;);</span><br><span class="line">render(&lt;Container person=&#123;person&#125; /&gt;, document.getElementById(&quot;app&quot;));</span><br><span class="line">person.name = &quot;world&quot;;</span><br></pre></td></tr></table></figure></p>
+<p>如果在Header和Footer里面做console.log，你会发现只有被Observer包裹的App组件进行了重新渲染，由于Container没有订阅数据变化，所以也不会重新渲染。<br>但如果不是对性能有极致的追求，observer已经足够了，大量的Observer会花费你很多精力来管理渲染问题。</p>
+<p><strong>参考链接：</strong></p>
+<ol>
+<li><a href="https://www.jianshu.com/p/1bb41b726324" target="_blank" rel="noopener">如何组织Mobx中的Store之一：构建State、拆分Action</a></li>
+<li><a href="https://qianduan.group/posts/59fc26fbbc868873528cd556cd556" target="_blank" rel="noopener">面向未来的前端数据流框架 - dob</a></li>
+<li><a href="https://segmentfault.com/a/1190000011936772" target="_blank" rel="noopener">为什么我们需要reselect</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/工作/" rel="tag"># 工作</a>
+          
+            <a href="/tags/周报/" rel="tag"># 周报</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/07/周报（2018-12-07）/" rel="next" title="周报（2018-12-07）">
+                <i class="fa fa-chevron-left"></i> 周报（2018-12-07）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/21/周报（2018-12-21）/" rel="prev" title="周报（2018-12-21）">
+                周报（2018-12-21） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#更响应式"><span class="nav-number">1.</span> <span class="nav-text">更响应式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#computed"><span class="nav-number">1.1.</span> <span class="nav-text">computed</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reaction"><span class="nav-number">1.2.</span> <span class="nav-text">reaction</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拆分store"><span class="nav-number">2.</span> <span class="nav-text">拆分store</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#细粒度的渲染"><span class="nav-number">3.</span> <span class="nav-text">细粒度的渲染</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

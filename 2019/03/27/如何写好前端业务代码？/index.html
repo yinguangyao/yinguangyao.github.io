@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,react,javascript,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言如何写出可维护和可读性高的代码，这一直是一个困扰很多人的问题。关于变量如何起名、如何优化if else之类的小技巧，这里就不做介绍了，推荐去看《代码大全2》，千书万书，都不如一本《代码大全2》。 工作以来，我一直在写一些重复且交互复杂的页面，也没有整理过自己的思路，这篇文章是我工作一年半来在项目中总结出来的一些经验。">
+<meta name="keywords" content="前端,react,javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何写好前端业务代码？">
+<meta property="og:url" content="http://yoursite.com/2019/03/27/如何写好前端业务代码？/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="前言如何写出可维护和可读性高的代码，这一直是一个困扰很多人的问题。关于变量如何起名、如何优化if else之类的小技巧，这里就不做介绍了，推荐去看《代码大全2》，千书万书，都不如一本《代码大全2》。 工作以来，我一直在写一些重复且交互复杂的页面，也没有整理过自己的思路，这篇文章是我工作一年半来在项目中总结出来的一些经验。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699e115a0724a58?w=1074&h=798&f=png&s=61000">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b427d326?w=416&h=687&f=png&s=235835">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b41c1ea6?w=420&h=687&f=png&s=236813">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b433857b?w=427&h=689&f=png&s=59076">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b448c96a?w=420&h=419&f=png&s=41349">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699e08ee230f8c4?w=129&h=129&f=png&s=12818">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何写好前端业务代码？">
+<meta name="twitter:description" content="前言如何写出可维护和可读性高的代码，这一直是一个困扰很多人的问题。关于变量如何起名、如何优化if else之类的小技巧，这里就不做介绍了，推荐去看《代码大全2》，千书万书，都不如一本《代码大全2》。 工作以来，我一直在写一些重复且交互复杂的页面，也没有整理过自己的思路，这篇文章是我工作一年半来在项目中总结出来的一些经验。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/3/21/1699e115a0724a58?w=1074&h=798&f=png&s=61000">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/27/如何写好前端业务代码？/">
+
+
+
+
+
+  <title>如何写好前端业务代码？ | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/27/如何写好前端业务代码？/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">如何写好前端业务代码？</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-27T23:08:16+08:00">
+                2019-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/27/如何写好前端业务代码？/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/03/27/如何写好前端业务代码？/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如何写出可维护和可读性高的代码，这一直是一个困扰很多人的问题。关于变量如何起名、如何优化if else之类的小技巧，这里就不做介绍了，推荐去看《代码大全2》，千书万书，都不如一本《代码大全2》。</p>
+<p>工作以来，我一直在写一些重复且交互复杂的页面，也没有整理过自己的思路，这篇文章是我工作一年半来在项目中总结出来的一些经验。<br><a id="more"></a></p>
+<h2 id="分层"><a href="#分层" class="headerlink" title="分层"></a>分层</h2><p>对于业务代码来说，大部分的前端应用都还是以展示数据为主，无非是从接口拿到数据，进行一系列数据格式化后，显示在页面当中。</p>
+<p>首先，应当尽可能的进行分层，传统的mvc分层很适用于前端开发，但对于复杂页面来说，随着业务逻辑增加，往往会造成controller臃肿的问题。因此，在此之上，可以将controller其分成formatter、service等等。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699e115a0724a58?w=1074&amp;h=798&amp;f=png&amp;s=61000" alt><br>下面这是一些分层后简单的目录结构。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">+ pages</span><br><span class="line">    + hotelList</span><br><span class="line">        + components</span><br><span class="line">            + Header.jsx</span><br><span class="line">        + formatter</span><br><span class="line">            + index.js</span><br><span class="line">        + share</span><br><span class="line">            + constants.js</span><br><span class="line">            + utils.js</span><br><span class="line">        + view.js</span><br><span class="line">        + controller.js</span><br><span class="line">        + model.js</span><br></pre></td></tr></table></figure></p>
+<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>统一管理所有请求路径，并且将页面中涉及到的网络请求封装为class。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// api.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">    HOTELLIST: <span class="string">'/hotelList'</span>,</span><br><span class="line">    HOTELDETAIL: <span class="string">'/hotelDetail'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Service.js</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    fetchHotelList = <span class="function">(<span class="params">params</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fetch(HOTELLIST, params);</span><br><span class="line">    &#125;</span><br><span class="line">    fetchHotelDetail = <span class="function">(<span class="params">params</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fetch(HOTELLIST, params);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Service</span><br></pre></td></tr></table></figure></p>
+<p>这样带来的好处就是，很清楚的知道页面中涉及了哪些请求，如果使用了TypeScript，后续某个请求方法名修改了后，在所有调用的地方也会提示错误，非常方便。</p>
+<h3 id="formatter"><a href="#formatter" class="headerlink" title="formatter"></a>formatter</h3><p>formatter层储存一些格式化数据的方法，这些方法接收数据，返回新的数据，不应该再涉及到其他的逻辑，这样有利于单元测试。单个format函数也不应该格式化过多数据，函数应该根据功能进行适当拆分，合理复用。</p>
+<h3 id="mvc"><a href="#mvc" class="headerlink" title="mvc"></a>mvc</h3><p>顾名思义，controller就是mvc中的c，controller应该是处理各种副作用操作（网络请求、缓存、事件响应等等）的地方。</p>
+<p>当处理一个请求的时候，controller会调用service里面对应的方法，拿到数据后再调用formatter的方法，将格式化后的数据存入store中，展示到页面上。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Controller</span> </span>&#123;</span><br><span class="line">    fetchHotelList = <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">async</span> (dispatch) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> params = &#123;&#125;</span><br><span class="line">        <span class="keyword">this</span>.showLoading();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> res = <span class="keyword">await</span> Service.fetchHotelList(params)</span><br><span class="line">            <span class="keyword">const</span> hotelList = formatHotelList(res.Data &amp;&amp; res.Data.HotelList)</span><br><span class="line">            dispatch(&#123;</span><br><span class="line">                type: <span class="string">'UPDATE_HOTELLIST'</span>,</span><br><span class="line">                hotelList</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">            <span class="keyword">this</span>.showError(err);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.hideLoading();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>view则是指react组件，建议尽量用纯函数组件，有了hooks之后，react也会变得更加纯粹（实际上有状态组件也可以看做一个mvc的结构，state是model，render是view，各种handler方法是controller）。</p>
+<p>对于react来说，最外层的一般称作容器组件，我们会在容器组件里面进行网络请求等副作用的操作。</p>
+<p>在这里，容器组件里面的一些逻辑也可以剥离出来放到controller中（react-imvc就是这种做法），这样就可以给controller赋予生命周期，容器组件只用于纯展示。</p>
+<p>我们将容器组件的生命周期放到wrapper这个高阶组件中，并在里面调用controller里面封装的生命周期，这样我们可以就编写更加纯粹的view，例如：</p>
+<p>wrapper.js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wrapper.js（伪代码）</span></span><br><span class="line"><span class="keyword">const</span> Wrapper = <span class="function">(<span class="params">view</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="class"><span class="keyword">class</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">        <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">            <span class="keyword">super</span>(props)</span><br><span class="line">        &#125;</span><br><span class="line">        componentWillMount() &#123;</span><br><span class="line">            <span class="keyword">this</span>.props.pageWillMount &amp;&amp; <span class="keyword">this</span>.props.pageWillMount()</span><br><span class="line">        &#125;</span><br><span class="line">        componentDidMount() &#123;</span><br><span class="line">                <span class="keyword">this</span>.props.pageDidMount &amp;&amp; <span class="keyword">this</span>.props.pageDidMount()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        componentWillUnmount() &#123;</span><br><span class="line">            <span class="keyword">this</span>.props.pageWillLeave &amp;&amp; <span class="keyword">this</span>.props.pageWillLeave()</span><br><span class="line">        &#125;</span><br><span class="line">        render() &#123;</span><br><span class="line">            <span class="keyword">const</span> &#123;</span><br><span class="line">                store: state,</span><br><span class="line">                actions</span><br><span class="line">            &#125; = <span class="keyword">this</span>.props</span><br><span class="line">            <span class="keyword">return</span> view(&#123;state, actions&#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>view.js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// view.js</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">view</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="function"><span class="params">    state,</span></span></span><br><span class="line"><span class="function"><span class="params">    actions</span></span></span><br><span class="line"><span class="function"><span class="params">&#125;</span>) </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        &lt;&gt;</span><br><span class="line">            &lt;Header </span><br><span class="line">                title=&#123;state.title&#125; </span><br><span class="line">                handleBack=&#123;actions.goBackPage&#125;</span><br><span class="line">            /&gt;</span><br><span class="line">            &lt;Body /&gt;</span><br><span class="line">            &lt;Footer /&gt;</span><br><span class="line">        &lt;<span class="regexp">/&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">export default Wrapper(view)</span></span><br></pre></td></tr></table></figure></p>
+<p>controller.js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// controller.js</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Controller</span> </span>&#123;</span><br><span class="line">    pageDidMount() &#123;</span><br><span class="line">        <span class="keyword">this</span>.bindScrollEvent(<span class="string">'on'</span>)</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'page did  mount'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    pageWillLeave() &#123;</span><br><span class="line">        <span class="keyword">this</span>.bindScrollEvent(<span class="string">'off'</span>)</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'page will leave'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    bindScrollEvent(status) &#123;</span><br><span class="line">        <span class="keyword">if</span> (status === <span class="string">'on) &#123;</span></span><br><span class="line"><span class="string">            this.bindScrollEvent('</span>off<span class="string">');</span></span><br><span class="line"><span class="string">            window.addEventListener('</span>scroll<span class="string">', this.handleScroll);</span></span><br><span class="line"><span class="string">        &#125; else if (status === '</span>off<span class="string">') &#123;</span></span><br><span class="line"><span class="string">            window.removeEventListener('</span>scroll<span class="string">', this.handleScroll);</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    // 滚动事件</span></span><br><span class="line"><span class="string">    handleScroll() &#123;</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>对于埋点来说，原本也应该放到controller中，但也是可以独立出来一个tracelog层，至于tracelog层如何实现和调用，还是看个人爱好，我比较喜欢用发布订阅的形式。</p>
+<p>如果还涉及到缓存，那我们也可以再分出来一个storage层，这里存放对缓存进行增删查改的各种操作。</p>
+<p>对于一些常用的固定不变的值，也可以放到constants.js，通过引入constants来获取值，这样便于后续维护。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// constants.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> cityMapping = &#123;</span><br><span class="line">    <span class="string">'1'</span>: <span class="string">'北京'</span>,</span><br><span class="line">    <span class="string">'2'</span>: <span class="string">'上海'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> traceKey = &#123;</span><br><span class="line">    <span class="string">'loading'</span>: <span class="string">'PAGE_LOADING'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// tracelog.js</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TraceLog</span> </span>&#123;</span><br><span class="line">    traceLoading = <span class="function">(<span class="params">params</span>) =&gt;</span> &#123;</span><br><span class="line">        tracelog(traceKey.loading, params);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> TraceLog</span><br><span class="line"></span><br><span class="line"><span class="comment">// storage.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">Storage</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> get instance() &#123;</span><br><span class="line">        <span class="comment">// </span></span><br><span class="line">    &#125;</span><br><span class="line">    setName(name) &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    getName() &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="数据与交互"><a href="#数据与交互" class="headerlink" title="数据与交互"></a>数据与交互</h2><p>不过也不代表着这样写就够了，分层只能够保证代码结构上的清晰，真正想写出好的业务代码，最重要的还是你对业务逻辑足够清晰，页面上的数据流动是怎样的？数据结构怎么设计更加合理？页面上有哪些交互？这些交互会带来哪些影响？</p>
+<p>以如下酒店列表页为例，这个页面看似简单，实际上包含了很多复杂的交互。</p>
+<p>上方的是四个筛选项菜单，点开后里面包含了很多子类筛选项，比如筛选里面包括了双床、大床、三床，价格/星级里面包含了高档/豪华、￥150-￥300等等。</p>
+<p>下方是快捷筛选项，对应了部分筛选项菜单里面的子类筛选项。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b427d326?w=416&amp;h=687&amp;f=png&amp;s=235835" alt="image_1d6dgvgio1hfg82u1kmo1u141tv69.png-230.3kB"></p>
+<p>当我们选中筛选里面的双床后，下方的双床也会被默认选中，反之当我们选中下方的双床后，筛选类别里面的双床也会被选中，名称还会回显到原来的筛选上。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b41c1ea6?w=420&amp;h=687&amp;f=png&amp;s=236813" alt="image_1d6dgvscipuea6nsnhl6a1ijam.png-231.3kB"></p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b433857b?w=427&amp;h=689&amp;f=png&amp;s=59076" alt="image_1d6dhiup11mnj12351f0fl36msh1g.png-57.7kB"></p>
+<p>除此之外，我们点击搜索框后，输入’双床’，联想词会出现双床，并表示这是个筛选项，如果用户选中了这个双床，我们依然需要筛选项和快捷筛选项默认选中。</p>
+<p>这三个地方都涉及到了筛选项，并且修改一个，其他两个地方就要跟着改变，更何况三者的数据来自于三个不同的接口数据，这是多么蛋疼的一件事情！</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699de85b448c96a?w=420&amp;h=419&amp;f=png&amp;s=41349" alt="image_1d6dhc833375eo118vq1od61j6u13.png-40.4kB"></p>
+<p>我借助这个例子来说明，在开始写页面之前，一定要对页面中的隐藏交互和数据流动很熟悉，也需要去设计更加合理的数据结构。</p>
+<p>对于深层次的列表结构，键值对会比数组查询速度更快，通过key也会更容易和其他数据进行联动，但是却不能保证顺序，有时候可能就需要牺牲空间来换时间。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假设筛选项床型type为1，大床id为1，双床id为2.</span></span><br><span class="line"><span class="keyword">const</span> bed = &#123;</span><br><span class="line">    <span class="string">'1-1'</span>: &#123;</span><br><span class="line">        name: <span class="string">'大床'</span>,</span><br><span class="line">        id: <span class="number">1</span>,</span><br><span class="line">        type: <span class="number">1</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'1-2'</span>: &#123;</span><br><span class="line">        name: <span class="string">'双床'</span>,</span><br><span class="line">        id: <span class="number">2</span>,</span><br><span class="line">        type: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> bedSort = [<span class="string">'1-1'</span>, <span class="string">'1-2'</span>] <span class="comment">// 保证展示顺序</span></span><br></pre></td></tr></table></figure></p>
+<p>当我们选中大床的时候，只需要保存’1-1’这个key，再和store中快捷筛选项列表里面的key进行mapping（快捷筛选项里面的项也应该格式化为{‘type-id’: filterItem}的键值对格式），这样从时间复杂度上说，比直接遍历两个数组更高效。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在开始写业务之前，理应先想清楚需求和业务逻辑，设计出合理的数据结构，对代码进行好的分层，这样在一定程度上可以写出可维护性更高的代码。</p>
+<p><strong>PS</strong>：欢迎大家关注我的公众号【前端小馆】，大家一起来讨论技术。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/3/21/1699e08ee230f8c4?w=129&amp;h=129&amp;f=png&amp;s=12818" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/react/" rel="tag"># react</a>
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/27/世界变了样/" rel="next" title="世界变了样">
+                <i class="fa fa-chevron-left"></i> 世界变了样
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分层"><span class="nav-number">2.</span> <span class="nav-text">分层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Service"><span class="nav-number">2.1.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#formatter"><span class="nav-number">2.2.</span> <span class="nav-text">formatter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mvc"><span class="nav-number">2.3.</span> <span class="nav-text">mvc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">2.4.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据与交互"><span class="nav-number">3.</span> <span class="nav-text">数据与交互</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="生活,思考,随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="达达-京东到家面试过去的时候，先让做了一张试卷，主要是考察http、css和js的。 笔试题（只记得这几道http相关的） http2.0的新特性有哪些？（选项是多路复用、头部压缩、设置优先级、服务端推送、二进制传输） DNS的作用有哪些？（选项是域名解析、防火墙、负载均衡、控制流量还有一个我不记得了） 以下哪些协议是可靠的？（选项是TCP、UDP、FTP、HTTP还有一个我不记得了） 以下关于P">
+<meta name="keywords" content="生活,思考,随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次社招面试（二）">
+<meta property="og:url" content="http://yoursite.com/2019/03/15/记一次社招面试（二）/index.html">
+<meta property="og:site_name" content="世界变了样">
+<meta property="og:description" content="达达-京东到家面试过去的时候，先让做了一张试卷，主要是考察http、css和js的。 笔试题（只记得这几道http相关的） http2.0的新特性有哪些？（选项是多路复用、头部压缩、设置优先级、服务端推送、二进制传输） DNS的作用有哪些？（选项是域名解析、防火墙、负载均衡、控制流量还有一个我不记得了） 以下哪些协议是可靠的？（选项是TCP、UDP、FTP、HTTP还有一个我不记得了） 以下关于P">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-15T12:34:37.876Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次社招面试（二）">
+<meta name="twitter:description" content="达达-京东到家面试过去的时候，先让做了一张试卷，主要是考察http、css和js的。 笔试题（只记得这几道http相关的） http2.0的新特性有哪些？（选项是多路复用、头部压缩、设置优先级、服务端推送、二进制传输） DNS的作用有哪些？（选项是域名解析、防火墙、负载均衡、控制流量还有一个我不记得了） 以下哪些协议是可靠的？（选项是TCP、UDP、FTP、HTTP还有一个我不记得了） 以下关于P">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/15/记一次社招面试（二）/">
+
+
+
+
+
+  <title>记一次社招面试（二） | 世界变了样</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?448000ce75d1075f20e390399ff237b9";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">世界变了样</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/记一次社招面试（二）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="尹光耀">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="世界变了样">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">记一次社招面试（二）</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-15T13:49:25+08:00">
+                2019-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/生活/" itemprop="url" rel="index">
+                    <span itemprop="name">生活</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/15/记一次社招面试（二）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/03/15/记一次社招面试（二）/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="达达-京东到家"><a href="#达达-京东到家" class="headerlink" title="达达-京东到家"></a>达达-京东到家</h2><p>面试过去的时候，先让做了一张试卷，主要是考察http、css和js的。</p>
+<h3 id="笔试题（只记得这几道http相关的）"><a href="#笔试题（只记得这几道http相关的）" class="headerlink" title="笔试题（只记得这几道http相关的）"></a>笔试题（只记得这几道http相关的）</h3><ol>
+<li>http2.0的新特性有哪些？（选项是多路复用、头部压缩、设置优先级、服务端推送、二进制传输）</li>
+<li>DNS的作用有哪些？（选项是域名解析、防火墙、负载均衡、控制流量还有一个我不记得了）</li>
+<li>以下哪些协议是可靠的？（选项是TCP、UDP、FTP、HTTP还有一个我不记得了）</li>
+<li>以下关于POST请求说法正确的是？（POST请求只能通过body带参数、服务器一定能够收到POST请求发送的数据、POST请求发送了两个数据包、POST请求可以被缓存）</li>
+</ol>
+<a id="more"></a>
+<h3 id="一面"><a href="#一面" class="headerlink" title="一面"></a>一面</h3><ol>
+<li>什么是BFC？垂直margin重叠是为什么？怎么解决这个问题？</li>
+<li>CSS里面有哪些相对单位？都是相对什么的？</li>
+<li>fixed是相对于谁定位的？如果加上transform会出现问题吗？</li>
+<li>什么是XSS攻击？怎么解决？</li>
+<li>innerHTML有什么问题？有什么简单的办法可以避免插入文本被XSS攻击吗？</li>
+<li>为什么不推荐用style内联元素？内联元素有什么缺点？（css文件可以缓存）</li>
+<li>什么是原型链？原型链的终点指向什么？</li>
+<li>cookie、sessionStorage、localStorage的区别和作用是？</li>
+<li>http状态码有哪些？301和302的区别是什么？304是指什么？</li>
+<li>什么是闭包？使用场景有哪些？闭包会引起什么问题？</li>
+<li>什么是浅拷贝和深拷贝？怎么实现一个深拷贝？</li>
+<li>lodash和ramda的区别是什么？</li>
+<li>HTML中attribute和property的区别是什么？</li>
+<li>怎么解决跨域？</li>
+<li>字符串和new String出来的字符串有啥区别？</li>
+</ol>
+<h3 id="二面"><a href="#二面" class="headerlink" title="二面"></a>二面</h3><ol>
+<li>解释一下react中setState？（说说setState的表现和原理实现）</li>
+<li>如果我需要上传一个文件，前端展示进度条，用setState会导致合并更新，你有什么好办法？（Promise封装setState、利用setState底层特性，使用异步函数（setTimeout、async）包裹）</li>
+<li>有状态组件和无状态组件，有人说有状态的更好复用，有人说无状态的更好复用，你平时写的时候是怎么分的？（这个还是要看业务场景）</li>
+<li>如果有个react项目，你该管理组件状态？（从local state、global state和global store三个方向来解释）</li>
+<li>react中组件是怎么响应数据的变化从而更新的呢？</li>
+<li>react中的生命周期分为哪几个阶段？react16废弃了哪几个生命周期api？</li>
+<li>虚拟DOM相比真实DOM，为什么会带来性能上的优化？</li>
+<li>diff算法是怎么比较新旧节点并更新的？</li>
+<li>如果我这里有一个文本组件，我修改了里面的文本，那么会影响到其他的组件吗？（所以这个还是要看场景）</li>
+<li>如果store中有一个cityList字段，我们需要在用户刷新后保持原来的样子，做缓存，如果这个时候上方下达了一个命令，需要关闭某个城市的物流配送，这个时候需要将该城市移除，用户不刷新浏览器的情况下，如何做到？（这道题说实话我没理解，我说更新store和缓存，但被面试官否定了，后来只能说不知道，也忘了问他答案是什么了）</li>
+<li>对webpack有了解吗？chunk、bundle和module有什么区别？</li>
+<li>说说hash、chunkhash和contenthash的区别？</li>
+<li>TypeScript有哪些好处？</li>
+<li>浏览器页面渲染的流程是什么？</li>
+<li>css会阻塞页面渲染吗？该怎么解决？怎么做到只加载首页的css？</li>
+<li>你觉得你最擅长的技术是哪一块呢？</li>
+</ol>
+<h3 id="综合面（综合-HR-部门leader）"><a href="#综合面（综合-HR-部门leader）" class="headerlink" title="综合面（综合+HR+部门leader）"></a>综合面（综合+HR+部门leader）</h3><ol>
+<li>从你的项目中随便找一个，说一说这个项目解决了哪方面的问题，业务或者技术上的都行。</li>
+<li>这个项目中你的角色是什么？你做了哪些？哪里又能够体现你的能力呢？</li>
+<li>为什么只在携程呆了一年多就出来找工作了？你现在的职级是多少？</li>
+<li>你最近有看过什么书？最近在研究的技术是什么？</li>
+<li>用过vue吗？感觉和react的区别是什么？如果让你做vue项目，你能接受吗？</li>
+<li>这边是一个vue重构到react的项目，最近招人来做这块的内容，包括webpack之类的都是重新搭，你觉得你能hold住吗？</li>
+<li>打算在上海定居吗？是打算啥时候回二线？</li>
+<li>你未来3-5年的职业规划是什么？</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>二面的时候，面试官问我有什么想问的吗？我说，对于我这种刚毕业1-2年的人来说，我对webpack和node接触比较少，在公司也很少用到，感觉更像是个螺丝钉的角色，我接下来该往哪方面发展呢？</p>
+<p>面试官说，你不是已经找到答案了吗？你之前说自己为什么离职的时候已经说的很清楚了。我觉得对于毕业1-3年的人来说，如果能够做到独立去带一个项目和小团队，这是非常可贵的。</p>
+<p>部门leader面的时候，问了我很多项目方面的问题，不少正中我要害，因为我以前在公司扮演了螺丝钉的角色，很难有机会和资源去带项目或者团队。在技术也不够突出的情况下，似乎很难说哪里能够体现出自己的能力。确实，一年多的经验很尴尬，如果能多呆半年，肯定就会有不一样的回答。</p>
+<p>HR面的时候，这个HR对携程的薪资待遇、职称等等可以说非常了解了，问了很多深入和细节的问题，也和我聊了很多，导致我非常尴尬和紧张。（事实上我觉得这些问题我可以整理一下，便于应对之后的面试）</p>
+<p>这个面试可以说是我面过的最久一次了，前后面了一共五轮，关键是面完就让我回家了。不过，还算是一次愉快的面试，至少让我积累了一大笔很宝贵的面试经验。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="尹光耀 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="尹光耀 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/生活/" rel="tag"># 生活</a>
+          
+            <a href="/tags/思考/" rel="tag"># 思考</a>
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/14/再见，携程/" rel="next" title="再见，携程">
+                <i class="fa fa-chevron-left"></i> 再见，携程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/27/世界变了样/" rel="prev" title="世界变了样">
+                世界变了样 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="尹光耀">
+            
+              <p class="site-author-name" itemprop="name">尹光耀</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yinguangyao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/6530276261/profile?topnav=1&wvr=6" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://segmentfault.com/u/yinguangyao" target="_blank" title="sf.gg">
+                      
+                        <i class="fa fa-fw fa-globe"></i>sf.gg</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/yin-guang-yao-96/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-zhihu"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#达达-京东到家"><span class="nav-number">1.</span> <span class="nav-text">达达-京东到家</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#笔试题（只记得这几道http相关的）"><span class="nav-number">1.1.</span> <span class="nav-text">笔试题（只记得这几道http相关的）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一面"><span class="nav-number">1.2.</span> <span class="nav-text">一面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二面"><span class="nav-number">1.3.</span> <span class="nav-text">二面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#综合面（综合-HR-部门leader）"><span class="nav-number">1.4.</span> <span class="nav-text">综合面（综合+HR+部门leader）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">尹光耀</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'y9hihssWV7A74xo1r2BsTFQC-gzGzoHsz',
+        appKey: 'JECyn6ArPKLf3DBNjH1SdH8H',
+        placeholder: '请留下你的评论',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
